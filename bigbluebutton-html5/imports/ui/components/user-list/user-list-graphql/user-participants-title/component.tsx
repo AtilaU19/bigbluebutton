@@ -4,6 +4,7 @@ import { USER_AGGREGATE_COUNT_SUBSCRIPTION } from '/imports/ui/core/graphql/quer
 import UserTitleOptionsContainer from './user-options-dropdown/component';
 import Styled from './styles';
 import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
+import GroupIcon from '@mui/icons-material/GroupRounded';
 import { USER_WITH_AUDIO_AGGREGATE_COUNT_SUBSCRIPTION } from './queries';
 
 interface UserTitleProps {
@@ -29,25 +30,32 @@ const UserTitle: React.FC<UserTitleProps> = ({
   const containerStyle = {
     display: 'flex',
     alignItems: 'center',
-    marginBottom: '0.6rem',
-    marginTop: '.75rem',
+    padding: '0.6rem 0px 0.6rem 0.6rem',
+    margin: '2px 0px 2px 2px',
     justifyContent: sidebarNavigationWidth < 115 ? 'center' : 'flex-start',
   };
 
   return (
-    <div style={containerStyle} >
-      {sidebarNavigationWidth >= 115 && (
-        <Styled.SmallTitle>
-          {intl.formatMessage(messages.usersTitle)}
-          <span
-            data-test-users-count={count}
-            data-test-users-with-audio-count={countWithAudio}
-          >
-            {` (${count.toLocaleString('en-US', { notation: 'standard' })})`}
-          </span>
-        </Styled.SmallTitle>
-      )}
-      <UserTitleOptionsContainer />
+    <div style={{ display: 'flex', margin: '0px 0px 1px 0.45rem', }}>
+      <div style={containerStyle}>
+        {sidebarNavigationWidth >= 115 && (
+          <>
+            <GroupIcon fontSize="large" style={{ marginRight: '0.3rem' }} />
+            <Styled.SmallTitle style={{ flex: '0 1 auto', maxWidth: '120px', fontSize: '0.8rem' }}>
+              {intl.formatMessage(messages.usersTitle)}
+              <span
+                data-test-users-count={count}
+                data-test-users-with-audio-count={countWithAudio}
+                style={{ marginLeft: '0.2rem' }}
+              >
+                {` (${count.toLocaleString('en-US', { notation: 'standard' })})`}
+              </span>
+            </Styled.SmallTitle>
+          </>
+        )}
+        <UserTitleOptionsContainer 
+        />
+      </div>
     </div>
   );
 };

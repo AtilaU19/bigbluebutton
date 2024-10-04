@@ -10,13 +10,9 @@ const OptionsButton = styled(Button)`
   display: block;
   padding: 0;
   margin: 0 0.25rem;
-  ${(props) =>
-    props.sidebarNavigationWidth < 115 &&
-    `
-      width: 50px;
-      height: 50px; 
-      font-size: ${fontSizeXXL}
-    `}
+   width: ${(props) => (props.sidebarNavigationWidth < 115 ? '60px' : 'auto')};
+  height: ${(props) => (props.sidebarNavigationWidth < 115 ? '60px' : 'auto')}; 
+  font-size: ${(props) => (props.sidebarNavigationWidth < 115 ? fontSizeXXL : 'inherit')};
 
   span {
     padding: inherit;

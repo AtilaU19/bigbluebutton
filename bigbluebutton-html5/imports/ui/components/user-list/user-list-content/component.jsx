@@ -54,6 +54,7 @@ class UserContent extends PureComponent {
         <UserPollsContainer isPresenter={currentUser?.presenter} sidebarNavigationWidth={sidebarNavigationWidth} />
         <BreakoutRoomContainer />
         <GenericSidekickContentNavButtonContainer />
+        <Styled.Separator />
         <UserTitleContainer sidebarNavigationWidth={sidebarNavigationWidth}/>
         <UserListParticipants compact={compact} sidebarNavigationWidth={sidebarNavigationWidth} />
       </Styled.Content>

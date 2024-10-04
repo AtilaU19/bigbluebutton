@@ -158,10 +158,9 @@ const UnreadMessagesText = styled(FlexColumn)`
 `;
 
 const Separator = styled.hr`
-  margin: 1rem auto;
-  width: 2.2rem;
+  width: 80%;
   border: 0;
-  border-top: 1px solid ${colorGrayLighter};
+  border-top: 1px solid ${colorGrayLightest};
 `;
 
 export default {
