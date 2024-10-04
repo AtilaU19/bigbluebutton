@@ -11,10 +11,22 @@ import {
 import { smPaddingX, borderSize } from '/imports/ui/stylesheets/styled-components/general';
 
 const UserList = styled(FlexColumn)`
-  justify-content: flex-start;
+  justify-content: space-between;
   background-color: ${userListBg};
   color: ${userListText};
-  height: 100%;
+  height: calc(100vh - 80px); 
+  width: auto;
+  min-width: 80px;
+  max-width: 300px;
+  margin-top: 40px;
+  margin-left: 25px;
+  margin-right: 10px;
+  padding-top: 0px;
+  padding-bottom: 48px;
+  border-radius: 48px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  resize: none;
 `;
 
 const SmallTitle = styled.h2`
@@ -72,9 +84,16 @@ const ListItem = styled.div`
   }
 `;
 
+const Header = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
 export default {
   UserList,
   SmallTitle,
   ListItem,
   Messages,
+  Header,
 };

@@ -19,9 +19,11 @@ const UserPolls = ({
   forcePollOpen,
   sidebarContentPanel,
   layoutContextDispatch,
+  sidebarNavigationWidth,
 }) => {
   if (!isPresenter) return null;
   if (!pollIsOpen && !forcePollOpen) return null;
+  const shouldRenderTitle = sidebarNavigationWidth >= 115;
 
   const handleClickTogglePoll = () => {
     layoutContextDispatch({
@@ -38,11 +40,6 @@ const UserPolls = ({
 
   return (
     <Styled.Messages>
-      <Styled.Container>
-        <Styled.SmallTitle>
-          {intl.formatMessage(intlMessages.pollLabel)}
-        </Styled.SmallTitle>
-      </Styled.Container>
       <Styled.List>
         <Styled.ScrollableList>
           <Styled.ListItem
@@ -56,9 +53,16 @@ const UserPolls = ({
                 handleClickTogglePoll();
               }
             }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: shouldRenderTitle ? 'flex-start' : 'center',
+            }}
           >
             <Icon iconName="polling" />
-            <span>{intl.formatMessage(intlMessages.pollLabel)}</span>
+            {shouldRenderTitle && (
+              <span>{intl.formatMessage(intlMessages.pollLabel)}</span>
+            )}
           </Styled.ListItem>
         </Styled.ScrollableList>
       </Styled.List>

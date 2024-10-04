@@ -177,9 +177,9 @@ const LayoutEngine = () => {
 
     const { isOpen, width: sidebarNavWidth } = sidebarNavigationInput;
 
-    let minWidth = 0;
-    let width = 0;
-    let maxWidth = 0;
+    let minWidth = sidebarNavMinWidth;
+    let width = sidebarNavMinWidth;
+    let maxWidth = sidebarNavMaxWidth;
     if (isOpen) {
       if (isMobile) {
         minWidth = windowWidth();

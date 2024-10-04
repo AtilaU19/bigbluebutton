@@ -6,7 +6,7 @@ const SidebarNavigationContainer = () => {
   const sidebarNavigation = layoutSelectOutput((i) => i.sidebarNavigation);
   const layoutContextDispatch = layoutDispatch();
 
-  if (sidebarNavigation.display === false) return null;
+  //if (sidebarNavigation.display === false) return null;
 
   return (
     <SidebarNavigation

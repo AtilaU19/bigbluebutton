@@ -36,9 +36,6 @@ const BreakoutRoomItem = ({
     return (
       <Styled.Messages>
         <Styled.Container>
-          <Styled.SmallTitle>
-            {intl.formatMessage(intlMessages.breakoutTitle)}
-          </Styled.SmallTitle>
         </Styled.Container>
         <Styled.ScrollableList>
           <Styled.List>

@@ -40,8 +40,6 @@ const Messages = styled(Styled.Messages)``;
 
 const Container = styled(StyledContent.Container)``;
 
-const SmallTitle = styled(Styled.SmallTitle)``;
-
 const ScrollableList = styled(StyledContent.ScrollableList)``;
 
 const List = styled(StyledContent.List)``;
@@ -54,7 +52,6 @@ export default {
   NotesLock,
   Messages,
   Container,
-  SmallTitle,
   ScrollableList,
   List,
 };

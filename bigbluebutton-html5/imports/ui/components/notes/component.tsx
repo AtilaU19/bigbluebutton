@@ -141,7 +141,8 @@ const NotesGraphql: React.FC<NotesGraphqlProps> = (props) => {
       {!isOnMediaArea ? (
         // @ts-ignore Until everything in Typescript
         <Header
-          leftButtonProps={{
+          title={intl.formatMessage(intlMessages.title)}
+          rightButtonProps={{
             onClick: () => {
               layoutContextDispatch({
                 type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
@@ -153,6 +154,7 @@ const NotesGraphql: React.FC<NotesGraphqlProps> = (props) => {
               });
             },
             'data-test': 'hideNotesLabel',
+            'icon': 'close',
             'aria-label': intl.formatMessage(intlMessages.hide),
             label: intl.formatMessage(intlMessages.title),
           }}
@@ -161,6 +163,7 @@ const NotesGraphql: React.FC<NotesGraphqlProps> = (props) => {
           }
         />
       ) : renderHeaderOnMedia()}
+      <Styled.Separator />
       <PadContainer
         externalId={NOTES_CONFIG.id}
         hasPermission={hasPermission}

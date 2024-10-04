@@ -9,6 +9,7 @@ import { USER_WITH_AUDIO_AGGREGATE_COUNT_SUBSCRIPTION } from './queries';
 interface UserTitleProps {
   count: number;
   countWithAudio: number;
+  sidebarNavigationWidth: number;
 }
 
 const messages = defineMessages({
@@ -21,25 +22,37 @@ const messages = defineMessages({
 const UserTitle: React.FC<UserTitleProps> = ({
   count,
   countWithAudio,
+  sidebarNavigationWidth,
 }) => {
   const intl = useIntl();
+
+  const containerStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    marginBottom: '0.6rem',
+    marginTop: '.75rem',
+    justifyContent: sidebarNavigationWidth < 115 ? 'center' : 'flex-start',
+  };
+
   return (
-    <Styled.Container>
-      <Styled.SmallTitle>
-        {intl.formatMessage(messages.usersTitle)}
-        <span
-          data-test-users-count={count}
-          data-test-users-with-audio-count={countWithAudio}
-        >
-          {` (${count.toLocaleString('en-US', { notation: 'standard' })})`}
-        </span>
-      </Styled.SmallTitle>
+    <div style={containerStyle} >
+      {sidebarNavigationWidth >= 115 && (
+        <Styled.SmallTitle>
+          {intl.formatMessage(messages.usersTitle)}
+          <span
+            data-test-users-count={count}
+            data-test-users-with-audio-count={countWithAudio}
+          >
+            {` (${count.toLocaleString('en-US', { notation: 'standard' })})`}
+          </span>
+        </Styled.SmallTitle>
+      )}
       <UserTitleOptionsContainer />
-    </Styled.Container>
+    </div>
   );
 };
 
-const UserTitleContainer: React.FC = () => {
+const UserTitleContainer: React.FC<{ sidebarNavigationWidth: number }> = ({ sidebarNavigationWidth }) => {
   const getCountData = () => {
     const { data: countData } = useDeduplicatedSubscription(USER_AGGREGATE_COUNT_SUBSCRIPTION);
     const count = countData?.user_aggregate?.aggregate?.count || 0;
@@ -55,6 +68,7 @@ const UserTitleContainer: React.FC = () => {
     <UserTitle
       count={getCountData() as number}
       countWithAudio={countWithAudio}
+      sidebarNavigationWidth={sidebarNavigationWidth}
     />
   );
 };

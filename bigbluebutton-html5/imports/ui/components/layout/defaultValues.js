@@ -27,7 +27,7 @@ const DEFAULT_VALUES = {
   actionBarTabOrder: 6,
 
   sidebarNavMaxWidth: 240,
-  sidebarNavMinWidth: 70,
+  sidebarNavMinWidth: 114,
   sidebarNavHeight: '100%',
   sidebarNavTop: 0,
   sidebarNavLeft: 0,

@@ -9,8 +9,6 @@ const Messages = styled(Styled.Messages)``;
 
 const Container = styled(StyledContent.Container)``;
 
-const SmallTitle = styled(Styled.SmallTitle)``;
-
 const ScrollableList = styled(StyledContent.ScrollableList)``;
 
 const List = styled(StyledContent.List)``;
@@ -35,7 +33,6 @@ const BreakoutDuration = styled.p`
 export default {
   Messages,
   Container,
-  SmallTitle,
   ScrollableList,
   List,
   ListItem,

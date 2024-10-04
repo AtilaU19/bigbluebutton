@@ -63,6 +63,7 @@ interface UserNotesGraphqlProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   toggleNotesPanel: (sidebarContentPanel: any, layoutContextDispatch: any) => void,
   isEnabled: boolean,
+  sidebarNavigationWidth: number,
 }
 
 interface UserNotesContainerGraphqlProps {
@@ -80,6 +81,7 @@ const UserNotesGraphql: React.FC<UserNotesGraphqlProps> = (props) => {
     hasUnreadNotes,
     markNotesAsRead,
     toggleNotesPanel,
+    sidebarNavigationWidth,
   } = props;
   const [unread, setUnread] = useState(false);
   const [pinWasNotified, setPinWasNotified] = useState(false);
@@ -126,6 +128,7 @@ const UserNotesGraphql: React.FC<UserNotesGraphqlProps> = (props) => {
       );
     }
 
+    const shouldRenderTitle = sidebarNavigationWidth >= 115;
     const showTitle = isPinned ? intl.formatMessage(intlMessages.sharedNotesPinned)
       : intl.formatMessage(intlMessages.sharedNotes);
     return (
@@ -147,26 +150,30 @@ const UserNotesGraphql: React.FC<UserNotesGraphqlProps> = (props) => {
         as={isPinned ? 'button' : 'div'}
         disabled={isPinned}
         $disabled={isPinned}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: shouldRenderTitle ? 'flex-start' : 'center',
+        }}
       >
         {/* @ts-ignore */}
         <Icon iconName="copy" />
+        {shouldRenderTitle && (
         <div aria-hidden>
           <Styled.NotesTitle data-test="sharedNotes">
-            { showTitle }
+            {showTitle}
           </Styled.NotesTitle>
-          {disableNotes
-            ? (
-              <Styled.NotesLock>
-                {/* @ts-ignore */}
-                <Icon iconName="lock" />
-                <span id="lockedNotes">{`${intl.formatMessage(intlMessages.locked)} ${intl.formatMessage(intlMessages.byModerator)}`}</span>
-              </Styled.NotesLock>
-            ) : null}
-          {isPinned
-            ? (
-              <span className="sr-only">{`${intl.formatMessage(intlMessages.disabled)}`}</span>
-            ) : null}
+          {disableNotes && (
+            <Styled.NotesLock>
+              <Icon iconName="lock" />
+              <span id="lockedNotes">{`${intl.formatMessage(intlMessages.locked)} ${intl.formatMessage(intlMessages.byModerator)}`}</span>
+            </Styled.NotesLock>
+          )}
+          {isPinned && (
+            <span className="sr-only">{`${intl.formatMessage(intlMessages.disabled)}`}</span>
+          )}
         </div>
+      )}
         {notification}
       </Styled.ListItem>
     );
@@ -176,11 +183,6 @@ const UserNotesGraphql: React.FC<UserNotesGraphqlProps> = (props) => {
 
   return (
     <Styled.Messages>
-      <Styled.Container>
-        <Styled.SmallTitle data-test="notesTitle">
-          {intl.formatMessage(intlMessages.title)}
-        </Styled.SmallTitle>
-      </Styled.Container>
       <Styled.ScrollableList>
         <Styled.List>
           {renderNotes()}
@@ -196,7 +198,7 @@ const UserNotesContainerGraphql: React.FC<UserNotesContainerGraphqlProps> = (pro
       sharedNotesExtId: string;
     }>;
   };
-  const { userLocks } = props;
+  const { userLocks, sidebarNavigationWidth  } = props;
   const disableNotes = userLocks.userNotes;
   const [pinnedPadDataState, setPinnedPadDataState] = useState<PinnedPadData | null>(null);
 
@@ -237,6 +239,7 @@ const UserNotesContainerGraphql: React.FC<UserNotesContainerGraphqlProps> = (pro
       markNotesAsRead={markNotesAsRead}
       toggleNotesPanel={NotesService.toggleNotesPanel}
       isEnabled={isEnabled}
+      sidebarNavigationWidth={sidebarNavigationWidth}
     />
   );
 };

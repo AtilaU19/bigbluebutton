@@ -39,6 +39,9 @@ import { indexOf, without } from '/imports/utils/array-utils';
 import { GraphqlDataHookSubscriptionResponse } from '/imports/ui/Types/hook';
 import { throttle } from '/imports/utils/throttle';
 import logger from '/imports/startup/client/logger';
+import IconButton from '@mui/material/IconButton';
+import AddReactionIcon from '@mui/icons-material/AddReaction';
+import SendIcon from '@mui/icons-material/Send';
 
 const CLOSED_CHAT_LIST_KEY = 'closedChatList';
 const START_TYPING_THROTTLE_INTERVAL = 1000;
@@ -464,32 +467,28 @@ const ChatMessageForm: React.FC<ChatMessageFormProps> = ({
             onCopy={(e) => { e.stopPropagation(); }}
             async
           />
-          {ENABLE_EMOJI_PICKER ? (
-            <Styled.EmojiButton
-              ref={emojiPickerButtonRef}
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              icon="happy"
-              color="light"
-              ghost
-              type="button"
-              circle
-              hideLabel
-              label={intl.formatMessage(messages.emojiButtonLabel)}
-              data-test="emojiPickerButton"
-            />
-          ) : null}
-          <Styled.SendButton
+          {ENABLE_EMOJI_PICKER && (
+          <IconButton
+            ref={emojiPickerButtonRef}
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            color="default"
+            aria-label={intl.formatMessage(messages.emojiButtonLabel)}
+            data-test="emojiPickerButton"
+          >
+            <AddReactionIcon />
+          </IconButton>
+        )}
+          <IconButton
             hideLabel
-            circle
             aria-label={intl.formatMessage(messages.submitLabel)}
             type="submit"
             disabled={disabled || partnerIsLoggedOut || chatSendMessageLoading}
-            label={intl.formatMessage(messages.submitLabel)}
             color="primary"
-            icon="send"
             onClick={() => { }}
             data-test="sendMessageButton"
-          />
+          >
+          <SendIcon />
+          </IconButton>
         </Styled.Wrapper>
         {
           error && (

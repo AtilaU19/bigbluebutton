@@ -5,7 +5,6 @@ const Header = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: ${jumboPaddingY};
 `;
 
 const RightWrapper = styled.div`
@@ -14,7 +13,16 @@ const RightWrapper = styled.div`
   }
 `;
 
+export const Title = styled.h2`
+  flex-grow: 1;
+  text-align: flex-start;
+  margin: 0;
+  font-size: 1rem;
+`;
+
+
 export default {
   Header,
   RightWrapper,
+  Title,
 };

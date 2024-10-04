@@ -13,6 +13,7 @@ const propTypes = {
   sidebarContentPanel: PropTypes.shape().isRequired,
   layoutContextDispatch: PropTypes.shape().isRequired,
   isModerator: PropTypes.bool.isRequired,
+  sidebarNavigationWidth: PropTypes.number.isRequired,
 };
 
 const intlMessages = defineMessages({
@@ -38,19 +39,16 @@ class Timer extends PureComponent {
       stopwatch,
       sidebarContentPanel,
       layoutContextDispatch,
+      sidebarNavigationWidth,
     } = this.props;
 
     if (!isModerator) return null;
 
     const message = stopwatch ? intlMessages.stopwatch : intlMessages.timer;
+    const shouldRenderTitle = sidebarNavigationWidth >= 115;
 
     return (
       <Styled.Messages>
-        <Styled.Container>
-          <Styled.SmallTitle>
-            {intl.formatMessage(intlMessages.title)}
-          </Styled.SmallTitle>
-        </Styled.Container>
         <Styled.ScrollableList>
           <Styled.List>
             <Styled.ListItem
@@ -69,11 +67,18 @@ class Timer extends PureComponent {
                     : PANELS.TIMER,
                 });
               }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: shouldRenderTitle ? 'flex-start' : 'center',
+              }}
             >
               <Icon iconName="time" />
-              <span>
-                {intl.formatMessage(message)}
-              </span>
+              {shouldRenderTitle && (
+                <span>
+                  {intl.formatMessage(message)}
+                </span>
+              )}
             </Styled.ListItem>
           </Styled.List>
         </Styled.ScrollableList>

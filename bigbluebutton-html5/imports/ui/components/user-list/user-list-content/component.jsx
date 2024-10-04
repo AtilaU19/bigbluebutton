@@ -18,6 +18,7 @@ const propTypes = {
     presenter: PropTypes.bool.isRequired,
   }),
   compact: PropTypes.bool,
+  sidebarNavigation: PropTypes.object.isRequired,
   isTimerActive: PropTypes.bool,
 };
 
@@ -37,23 +38,24 @@ class UserContent extends PureComponent {
       isTimerActive,
       compact,
       isChatEnabled,
+      sidebarNavigationWidth
     } = this.props;
 
     const ROLE_MODERATOR = window.meetingClientSettings.public.user.role_moderator;
 
     return (
       <Styled.Content data-test="userListContent">
-        {isChatEnabled ? <ChatList /> : null}
-        <UserNotesContainer />
-        {isTimerActive && <TimerContainer isModerator={currentUser?.role === ROLE_MODERATOR} />}
+        {isChatEnabled ? <ChatList sidebarNavigationWidth={sidebarNavigationWidth} /> : null}
+        <UserNotesContainer sidebarNavigationWidth={sidebarNavigationWidth}/>
+        {isTimerActive && <TimerContainer isModerator={currentUser?.role === ROLE_MODERATOR} sidebarNavigationWidth={sidebarNavigationWidth} />}
         {currentUser?.role === ROLE_MODERATOR ? (
           <GuestPanelOpenerContainer />
           ) : null}
-        <UserPollsContainer isPresenter={currentUser?.presenter} />
+        <UserPollsContainer isPresenter={currentUser?.presenter} sidebarNavigationWidth={sidebarNavigationWidth} />
         <BreakoutRoomContainer />
         <GenericSidekickContentNavButtonContainer />
-        <UserTitleContainer />
-        <UserListParticipants compact={compact} />
+        <UserTitleContainer sidebarNavigationWidth={sidebarNavigationWidth}/>
+        <UserListParticipants compact={compact} sidebarNavigationWidth={sidebarNavigationWidth} />
       </Styled.Content>
     );
   }

@@ -16,8 +16,6 @@ import {
   colorSuccess,
 } from '/imports/ui/stylesheets/styled-components/palette';
 
-import Header from '/imports/ui/components/common/control-header/component';
-
 interface ChatWrapperProps {
   sameSender: boolean;
   isSystemSender: boolean;
@@ -84,16 +82,6 @@ export const ChatContent = styled.div<ChatContentProps>`
   ${({ sameSender, isCustomPluginMessage }) => sameSender
     && !isCustomPluginMessage && `
     margin-left: 2.6rem;
-  `}
-`;
-
-export const ChatHeader = styled(Header)`
-  ${({ isRTL }) => isRTL && `
-    padding-left: ${smPaddingX};
-  `}
-
-  ${({ isRTL }) => !isRTL && `
-    padding-right: ${smPaddingX};
   `}
 `;
 

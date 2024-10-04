@@ -20,13 +20,14 @@ import Button from '/imports/ui/components/common/button/component';
 
 const TimerSidebarContent = styled.div`
   background-color: ${colorWhite};
-  padding: ${smPaddingX};
+  padding: 16px 16px 0px;
   display: flex;
   flex-grow: 1;
   flex-direction: column;
   justify-content: space-around;
   overflow: hidden;
-  height: 100%;
+  height: 85%;
+  border-radius: 16px;
   transform: translateZ(0);
 `;
 
@@ -92,6 +93,7 @@ const TimerCurrent = styled.span`
   display: flex;
   font-size: xxx-large;
   justify-content: center;
+  margin: 1rem 0;
 `;
 
 const TimerType = styled.div`

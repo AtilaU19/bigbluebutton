@@ -385,10 +385,12 @@ const TimerPanel: React.FC<TimerPanelProps> = ({
     >
       {/* @ts-ignore - JS code */}
       <Header
-        leftButtonProps={{
+        title={intl.formatMessage(intlMessages.title)}
+        rightButtonProps={{
           onClick: closePanel,
           'aria-label': intl.formatMessage(intlMessages.hideTimerLabel),
           label: intl.formatMessage(headerMessage),
+          icon: 'close',
         }}
         data-test="timerHeader"
       />

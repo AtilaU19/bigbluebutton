@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable jsx-a11y/no-access-key */
 import React, { useEffect } from 'react';
-import { layoutSelect, layoutSelectInput, layoutDispatch } from '/imports/ui/components/layout/context';
+import { layoutSelect, layoutSelectInput, layoutSelectOutput , layoutDispatch } from '/imports/ui/components/layout/context';
 import { ACTIONS, PANELS } from '/imports/ui/components/layout/enums';
 import { defineMessages, useIntl } from 'react-intl';
 import Styled from './styles';
@@ -28,13 +28,13 @@ const intlMessages = defineMessages({
 interface ChatListItemProps {
   chat: Chat,
   chatNodeRef: React.Ref<HTMLButtonElement>,
+  sidebarNavigationWidth: number, 
 }
 
 const ChatListItem = (props: ChatListItemProps) => {
   const sidebarContent = layoutSelectInput((i: Input) => i.sidebarContent);
   const idChatOpen = layoutSelect((i: Layout) => i.idChatOpen);
   const layoutContextDispatch = layoutDispatch();
-
   const { sidebarContentPanel } = sidebarContent;
   const sidebarContentIsOpen = sidebarContent.isOpen;
 
@@ -42,6 +42,7 @@ const ChatListItem = (props: ChatListItemProps) => {
   const {
     chat,
     chatNodeRef,
+    sidebarNavigationWidth,
   } = props;
 
   const countUnreadMessages = chat.totalUnread || 0;
@@ -154,11 +155,11 @@ const ChatListItem = (props: ChatListItemProps) => {
       ref={chatNodeRef}
     >
       <Styled.ChatListItemLink>
-        <Styled.ChatIcon>
+        <Styled.ChatIcon sidebarNavigationWidth={sidebarNavigationWidth}>
           {isPublicGroupChat(chat)
             ? (
               <Styled.ChatThumbnail>
-                <Icon iconName="group_chat" className={undefined} prependIconName={undefined} rotate={undefined} color={undefined} />
+                <Icon iconName="group_chat" />
               </Styled.ChatThumbnail>
             ) : (
               <Styled.UserAvatar
@@ -170,12 +171,14 @@ const ChatListItem = (props: ChatListItemProps) => {
               </Styled.UserAvatar>
             )}
         </Styled.ChatIcon>
-        <Styled.ChatName>
-          <Styled.ChatNameMain active={false}>
-            {isPublicGroupChat(chat)
-              ? intl.formatMessage(intlMessages.titlePublic) : chat.participant?.name}
-          </Styled.ChatNameMain>
-        </Styled.ChatName>
+        {sidebarNavigationWidth >= 115 && (
+          <Styled.ChatName>
+            <Styled.ChatNameMain active={false}>
+              {isPublicGroupChat(chat)
+                ? intl.formatMessage(intlMessages.titlePublic) : chat.participant?.name}
+            </Styled.ChatNameMain>
+          </Styled.ChatName>
+        )}
         {(countUnreadMessages > 0)
           ? (
             <Styled.UnreadMessages data-test="unreadMessages" aria-label={arialabel}>

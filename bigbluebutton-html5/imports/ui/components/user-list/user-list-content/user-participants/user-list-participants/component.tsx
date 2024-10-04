@@ -97,7 +97,7 @@ const UserListParticipants: React.FC<UserListParticipantsProps> = ({
   };
   const amountOfPages = Math.ceil(count / 50);
   return (
-    <Styled.UserListColumn onKeyDown={rove} tabIndex={0}>
+    <Styled.UserListColumn data-teste="userlistcolumn" onKeyDown={rove} tabIndex={0}>
       <Styled.VirtualizedList ref={userListRef}>
         {
           Array.from({ length: amountOfPages }).map((_, i) => {

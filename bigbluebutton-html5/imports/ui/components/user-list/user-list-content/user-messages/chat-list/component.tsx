@@ -17,9 +17,10 @@ const intlMessages = defineMessages({
 
 interface ChatListProps {
     chats: Chat[],
+    sidebarNavigationWidth: number,
 }
 
-const getActiveChats = (chats: Chat[], chatNodeRef: React.Ref<HTMLButtonElement>) => chats.map((chat) => (
+const getActiveChats = (chats: Chat[], chatNodeRef: React.Ref<HTMLButtonElement>, sidebarNavigationWidth: number) => chats.map((chat) => (
   <CSSTransition
     classNames="transition"
     appear
@@ -34,12 +35,13 @@ const getActiveChats = (chats: Chat[], chatNodeRef: React.Ref<HTMLButtonElement>
       <ChatListItem
         chat={chat}
         chatNodeRef={chatNodeRef}
+        sidebarNavigationWidth={sidebarNavigationWidth}
       />
     </Styled.ListTransition>
   </CSSTransition>
 ));
 
-const ChatList: React.FC<ChatListProps> = ({ chats }) => {
+const ChatList: React.FC<ChatListProps> = ({ chats, sidebarNavigationWidth }) => {
   const messageListRef = React.useRef<HTMLDivElement | null >(null);
   const messageItemsRef = React.useRef<HTMLDivElement | null >(null);
   const [selectedChat, setSelectedChat] = React.useState<HTMLElement>();
@@ -61,11 +63,6 @@ const ChatList: React.FC<ChatListProps> = ({ chats }) => {
   const intl = useIntl();
   return (
     <Styled.Messages>
-      <Styled.Container>
-        <Styled.MessagesTitle data-test="messageTitle">
-          {intl.formatMessage(intlMessages.messagesTitle)}
-        </Styled.MessagesTitle>
-      </Styled.Container>
       <Styled.ScrollableList
         role="tabpanel"
         tabIndex={0}
@@ -74,7 +71,7 @@ const ChatList: React.FC<ChatListProps> = ({ chats }) => {
       >
         <Styled.List ref={messageItemsRef}>
           <TransitionGroup>
-            {getActiveChats(chats, chatNodeRef) ?? null}
+            {getActiveChats(chats, chatNodeRef, sidebarNavigationWidth) ?? null}
           </TransitionGroup>
         </Styled.List>
       </Styled.ScrollableList>
@@ -82,11 +79,11 @@ const ChatList: React.FC<ChatListProps> = ({ chats }) => {
   );
 };
 
-const ChatListContainer: React.FC = () => {
+const ChatListContainer: React.FC = ({ sidebarNavigationWidth }) => {
   const { data: chats } = useChat((chat) => chat) as GraphqlDataHookSubscriptionResponse<Chat[]>;
   if (chats) {
     return (
-      <ChatList chats={chats} />
+      <ChatList chats={chats} sidebarNavigationWidth={sidebarNavigationWidth} />
     );
   } return <></>;
 };

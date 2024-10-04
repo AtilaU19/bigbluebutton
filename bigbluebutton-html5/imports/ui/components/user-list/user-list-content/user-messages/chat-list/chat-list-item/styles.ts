@@ -43,8 +43,15 @@ const ChatListItemLink = styled.div`
   width: 100%;
 `;
 
-const ChatIcon = styled.div`
+const ChatIcon = styled.div<{ sidebarNavigationWidth: number }>`
   flex: 0 0 2.2rem;
+  
+  ${({ sidebarNavigationWidth }) => sidebarNavigationWidth < 115 && `
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; // Para ocupar espaço disponível
+  `}
 `;
 
 const UserAvatar = styled.div<UserAvatarProps>`
