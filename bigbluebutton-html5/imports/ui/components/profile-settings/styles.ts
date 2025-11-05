@@ -1,8 +1,4 @@
-import styled, { css, keyframes } from 'styled-components';
-import {
-  colorWhite, colorText, colorPrimary, colorDanger,
-  colorGrayDark, colorLink, listItemBgHover, colorBorder,
-} from '/imports/ui/stylesheets/styled-components/palette';
+import styled, { css, keyframes, DefaultTheme } from 'styled-components';
 import {
   smPadding,
   contentSidebarPadding,
@@ -36,14 +32,14 @@ const SimpleButton = styled.button`
   border: none;
   background: none;
   padding: 0;
-  outline: none; 
+  outline: none;
 `;
 
 const RootContainer = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: ${colorWhite};
+  background: ${({ theme }) => theme.colorWhite};
 `;
 
 const ProfileSettings = styled(ScrollboxVertical)`
@@ -53,7 +49,7 @@ const ProfileSettings = styled(ScrollboxVertical)`
   flex-direction: column;
   gap: 0.75rem;
   border-radius: ${contentSidebarBorderRadius};
-  background: ${colorWhite};
+  background: ${({ theme }) => theme.colorWhite};
   overflow-y: auto;
   overflow-x: hidden;
 `;
@@ -123,9 +119,9 @@ const VideoPreviewContent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: ${colorWhite};
-  
-  color: ${colorText};
+  background: ${({ theme }) => theme.colorWhite};
+
+  color: ${({ theme }) => theme.colorText};
   font-weight: normal;
 
   @media ${smallOnly} {
@@ -192,13 +188,13 @@ const UsernameContainer = styled.div`
 `;
 
 const UsernameTitle = styled.div`
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   font-size: ${fontSizeSmall};
   font-weight: ${textFontWeight};
 `;
 
 const Username = styled.div`
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   font-size: ${fontSizeLarge};
   font-weight: ${titlesFontWeight};
 `;
@@ -215,7 +211,7 @@ const UserPresenceContainer = styled.div`
   align-items: center;
   gap: 1rem;
   border-radius: 1rem;
-  border: 1px solid ${colorBorder};
+  border: 1px solid ${({ theme }) => theme.colorBorder};
 `;
 
 const UserPresenceButton = styled(SimpleButton)<{ active?: boolean }>`
@@ -227,8 +223,8 @@ const UserPresenceButton = styled(SimpleButton)<{ active?: boolean }>`
   align-self: stretch;
   border-radius: 0.5rem;
 
-  ${({ active }) => active && `
-    background: ${listItemBgHover};
+  ${({ active, theme }) => active && `
+    background: ${theme.listItemBgHover};
     cursor: not-allowed;
     pointer-events: none;
     border-radius: 1.0rem;
@@ -236,7 +232,7 @@ const UserPresenceButton = styled(SimpleButton)<{ active?: boolean }>`
 `;
 
 const UserPresenceText = styled.div`
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   text-align: center;
   font-size: ${fontSizeBase}
   font-weight: ${textFontWeight};
@@ -245,13 +241,13 @@ const UserPresenceText = styled.div`
 const UserPresenceDivider = styled.div`
   width: 0.0625rem;
   height: 2.5rem;
-  background: ${colorBorder};
+  background: ${({ theme }) => theme.colorBorder};
 `;
 
 const Separator = styled.hr`
   width: 100%;
   border: 0;
-  border-bottom: 1px solid ${colorBorder};
+  border-bottom: 1px solid ${({ theme }) => theme.colorBorder};
 `;
 
 const DevicesSettingsContainer = styled.div`
@@ -277,7 +273,7 @@ const Icon = `
   width: 1.5rem;
   height: 1.5rem;
   flex-shrink: 0;
-  color: ${colorPrimary};
+  color: ${({ theme }: { theme: DefaultTheme }) => theme.colorWhite};
 `;
 
 const IconCamera = styled(CameraIcon)`
@@ -301,13 +297,13 @@ const ArrowLeftIcon = styled(ArrowCircleLeft)`
   width: 2rem !important;
   height: 2rem !important;
   & path:first-of-type {
-    fill: ${colorPrimary};
+    fill: ${({ theme }) => theme.colorPrimary};
     fill-opacity: 1;
     opacity: 1;
   }
 
   & path:last-of-type {
-    fill: ${colorWhite};
+    fill: ${({ theme }) => theme.colorWhite};
   }
 `;
 
@@ -316,13 +312,13 @@ const ArrowRightIcon = styled(ArrowCircleRight)`
   width: 2rem !important;
   height: 2rem !important;
   & path:first-of-type {
-    fill: ${colorPrimary};
+    fill: ${({ theme }) => theme.colorPrimary};
     fill-opacity: 1;
     opacity: 1;
   }
 
   & path:last-of-type {
-    fill: ${colorWhite};
+    fill: ${({ theme }) => theme.colorWhite};
   }
 `;
 
@@ -346,7 +342,7 @@ const CameraQualityContainer = styled.div`
 `;
 
 const CameraQualityText = styled.div`
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   font-size: ${fontSizeSmall};
   font-weight: ${textFontWeight};
 `;
@@ -360,7 +356,7 @@ const CameraNameLabel = styled.div`
   bottom: 0.5rem;
   left: 0.5rem;
   background-color: rgba(0, 0, 0, 0.5);
-  color: ${colorWhite};
+  color: ${({ theme }) => theme.colorWhite};
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   font-size: ${fontSizeSmall};
@@ -382,7 +378,7 @@ const VirtualBackgroundContainer = styled.div<{ extraPadding?: boolean }>`
 const SwitchTitle = styled(FormControlLabel)`
   flex-shrink: 0;
   .MuiFormControlLabel-label {
-    color: ${colorGrayDark};
+    color: ${({ theme }) => theme.colorGrayDark};
     font-size: ${fontSizeBase}
     font-weight: ${textFontWeight};
   }
@@ -395,7 +391,6 @@ const MaterialSwitch = materialStyled(Switch)(({ theme }) => ({
   display: 'flex',
   '&:active': {
     '& .MuiSwitch-thumb': {
-      // width: 10,
     },
     '& .MuiSwitch-switchBase.Mui-checked': {
       transform: 'translateX(9px)',
@@ -408,10 +403,7 @@ const MaterialSwitch = materialStyled(Switch)(({ theme }) => ({
       color: '#fff',
       '& + .MuiSwitch-track': {
         opacity: 1,
-        backgroundColor: colorPrimary,
-        ...theme.applyStyles('dark', {
-          backgroundColor: colorPrimary,
-        }),
+        backgroundColor: theme.palette.primary.main,
       },
     },
   },
@@ -428,11 +420,10 @@ const MaterialSwitch = materialStyled(Switch)(({ theme }) => ({
   '& .MuiSwitch-track': {
     borderRadius: 16 / 2,
     opacity: 1,
-    backgroundColor: 'rgba(0,0,0,.25)',
     boxSizing: 'border-box',
-    ...theme.applyStyles('dark', {
-      backgroundColor: 'rgba(255,255,255,.35)',
-    }),
+    backgroundColor: theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,.35)'
+      : 'rgba(0,0,0,.25)',
   },
 }));
 
@@ -449,7 +440,7 @@ const BrightnessSlider = styled(Slider)`
 const VirtualBgSelectorBorder = styled.div`
   width: 100%;
   border-radius: 0.25rem;
-  border: 1px solid ${colorBorder};
+  border: 1px solid ${({ theme }) => theme.colorBorder};
 `;
 
 const CaptionsContainer = styled.div`
@@ -477,20 +468,20 @@ const CaptionsSelectorContainer = styled.div`
 `;
 
 const CaptionsLanguageText = styled.div`
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   font-size: ${fontSizeSmall};
   font-weight: ${textFontWeight};
 `;
 
 const CaptionsTerms = styled.div`
   padding-left: 2.7rem;
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   font-size: ${fontSizeSmall};
   font-weight: ${textFontWeight};
 `;
 
 const CaptionsTermsLink = styled.a`
-  color: ${colorLink};
+  color: ${({ theme }) => theme.colorLink};
 `;
 
 const AddCameraContainer = styled.div`
@@ -505,7 +496,7 @@ const AddCameraButtonAndText = styled.div<{ disabled?: boolean }>`
   gap: 1rem;
   &:hover {
     border-radius: 0.5rem;
-    background: #E9F0FF;
+    background: ${({ theme }) => theme.colorMessageBackground};
   }
 
   ${({ disabled }) => disabled && `
@@ -532,7 +523,7 @@ const StopSharingButtonText = styled.div<{ extraPadding?: boolean }>`
     padding-left: 3.5rem;
   `}
   cursor: pointer;
-  color: ${colorDanger};
+  color: ${({ theme }) => theme.colorDanger};
   text-decoration-line: underline;
   text-decoration-style: solid;
   text-decoration-skip-ink: auto;

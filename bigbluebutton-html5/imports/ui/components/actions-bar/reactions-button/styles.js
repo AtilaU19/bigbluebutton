@@ -1,20 +1,12 @@
 import styled from 'styled-components';
 import Button from '/imports/ui/components/common/button/component';
 
-import {
-  colorWhite,
-  colorGrayDark,
-  colorGrayLightest,
-  btnPrimaryColor,
-  btnPrimaryActiveBg,
-} from '/imports/ui/stylesheets/styled-components/palette';
-
 const ReactionsButton = styled(Button)`
-${({ ghost }) => ghost && `
+${({ ghost, theme }) => ghost && `
   & > span {
     box-shadow: none;
     background-color: transparent !important;
-    border-color: ${colorWhite} !important;
+    border-color: ${theme.colorWhite} !important;
   }
    `}
 `;
@@ -33,7 +25,7 @@ const ButtonWrapper = styled.div`
   margin: 0 .5rem;
 
   &:focus {
-    background-color: ${colorGrayDark};
+    background-color: ${({ theme }) => theme.colorGrayDark};
   }
 
   & > button {
@@ -43,7 +35,7 @@ const ButtonWrapper = styled.div`
 
   & > * > span {
     padding: 4px;
-    color: ${colorGrayDark} !important;
+    color: ${({ theme }) => theme.colorGrayDark} !important;
     border-color: transparent !important;
   }
 
@@ -51,14 +43,14 @@ const ButtonWrapper = styled.div`
     width: 1.3rem;
   }
 
-  ${({ active }) => active && `
-    color: ${btnPrimaryColor};
-    background-color: ${btnPrimaryActiveBg};
+  ${({ active, theme }) => active && `
+    color: ${theme.btnPrimaryColor};
+    background-color: ${theme.btnPrimaryActiveBg};
 
     &:hover{
       filter: brightness(90%);
-      color: ${btnPrimaryColor};
-      background-color: ${btnPrimaryActiveBg} !important;
+      color: ${theme.btnPrimaryColor};
+      background-color: ${theme.btnPrimaryActiveBg} !important;
     }
   `}
 `;
@@ -68,21 +60,21 @@ const ReactionsButtonWrapper = styled(ButtonWrapper)`
   border-radius: 1.7rem;
 
 
-  ${({ isMobile }) => !isMobile && `
-    border: 1px solid ${colorGrayLightest};
+  ${({ isMobile, theme }) => !isMobile && `
+    border: 1px solid ${theme.colorGrayLightest};
     padding: 1rem 0.5rem;
     width: auto;
   `}
 
-  ${({ active }) => active && `
-    color: ${btnPrimaryColor};
-    background-color: ${btnPrimaryActiveBg};
+  ${({ active, theme }) => active && `
+    color: ${theme.btnPrimaryColor};
+    background-color: ${theme.btnPrimaryActiveBg};
 
     &:hover{
       filter: brightness(90%);
-      color: ${btnPrimaryColor};
-      background-color: ${btnPrimaryActiveBg} !important;
-    }  
+      color: ${theme.btnPrimaryColor};
+      background-color: ${theme.btnPrimaryActiveBg} !important;
+    }
   `}
 `;
 

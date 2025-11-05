@@ -1,17 +1,10 @@
 import styled from 'styled-components';
-import {
-  colorGrayDark,
-  colorGrayLabel,
-  colorPrimary,
-  colorWhite,
-  colorGrayLighter,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import { Switch } from '@mui/material';
 import { styled as materialStyled } from '@mui/material/styles';
 import { borderSize, borderSizeLarge } from '/imports/ui/stylesheets/styled-components/general';
 
 const Title = styled.h3`
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
@@ -78,21 +71,20 @@ const FormElementCenter = styled.div`
 `;
 
 const Label = styled.span`
-  color: ${colorGrayLabel};
+  color: ${({ theme }) => theme.colorGrayLabel};
   font-size: 0.9rem;
 `;
 
 const Select = styled.select`
   &:focus {
-    box-shadow: inset 0 0 0 ${borderSizeLarge} ${colorPrimary};
+    box-shadow: inset 0 0 0 ${borderSizeLarge} ${({ theme }) => theme.colorPrimary};
     border-radius: ${borderSize};
   }
 
-  background-color: ${colorWhite};
-  border: ${borderSize} solid ${colorWhite};
-  border-radius: ${borderSize};
-  border-bottom: 0.1rem solid ${colorGrayLighter};
-  color: ${colorGrayLabel};
+  background-color: ${({ theme }) => theme.colorBackgroundComponent};
+  border: ${borderSize} solid transparent;
+  border-bottom: 0.1rem solid ${({ theme }) => theme.colorGrayLighter};
+  color: ${({ theme }) => theme.colorGrayLabel};
   width: 100%;
   height: 1.75rem;
   padding: 1px;
@@ -122,10 +114,7 @@ const MaterialSwitch = materialStyled(Switch)(({ theme }) => ({
       color: '#fff',
       '& + .MuiSwitch-track': {
         opacity: 1,
-        backgroundColor: colorPrimary,
-        ...theme.applyStyles('dark', {
-          backgroundColor: colorPrimary,
-        }),
+        backgroundColor: theme.palette.primary.main,
       },
     },
   },
@@ -142,11 +131,10 @@ const MaterialSwitch = materialStyled(Switch)(({ theme }) => ({
   '& .MuiSwitch-track': {
     borderRadius: '0.6rem',
     opacity: 1,
-    backgroundColor: 'rgba(0,0,0,.25)',
+    backgroundColor: theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,.35)'
+      : 'rgba(0,0,0,.25)',
     boxSizing: 'border-box',
-    ...theme.applyStyles('dark', {
-      backgroundColor: 'rgba(255,255,255,.35)',
-    }),
   },
 }));
 

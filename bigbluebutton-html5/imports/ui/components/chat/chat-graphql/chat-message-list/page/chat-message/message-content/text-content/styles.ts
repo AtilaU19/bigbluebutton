@@ -1,9 +1,4 @@
 import styled from 'styled-components';
-import {
-  colorGrayLightest,
-  colorOffWhite,
-  colorText,
-} from '/imports/ui/stylesheets/styled-components/palette';
 
 interface ChatMessageProps {
   systemMsg?: boolean;
@@ -14,7 +9,7 @@ export const ChatMessage = styled.div<ChatMessageProps>`
   display: flex;
   flex-flow: row;
   flex-direction: column;
-  color: ${colorText};
+  color: ${({ theme }) => theme.colorText};
   word-break: break-word;
 
   & img {
@@ -29,8 +24,8 @@ export const ChatMessage = styled.div<ChatMessageProps>`
 
   & code {
     white-space: pre-wrap;
-    background-color: ${colorOffWhite};
-    border: solid 1px ${colorGrayLightest};
+    background-color: ${({ theme }) => theme.colorOffWhite};
+    border: solid 1px ${({ theme }) => theme.colorGrayLightest};
     border-radius: 4px;
     padding: 2px;
     font-size: 12px;

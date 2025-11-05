@@ -1,12 +1,4 @@
 import styled from 'styled-components';
-import {
-  colorPrimary,
-  colorBlueAux,
-  appsGalleryOutlineColor,
-  unpinnedAppIconColor,
-  colorWhite,
-  colorBorder,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import Button from '/imports/ui/components/common/button/component';
 import { titlesFontWeight, headingsFontWeight, fontSizeBase } from '/imports/ui/stylesheets/styled-components/typography';
 import {
@@ -64,9 +56,9 @@ const RegisteredAppContent = styled.div`
   flex-direction: row;
   flex-grow: 1;
   border-radius: ${appsButtonsBorderRadius};
-  border-top: 1px solid ${colorBorder};
-  border-right: 1px solid ${colorBorder};
-  border-bottom: 1px solid ${colorBorder};
+  border-top: 1px solid ${({ theme }) => theme.colorBorder};
+  border-right: 1px solid ${({ theme }) => theme.colorBorder};
+  border-bottom: 1px solid ${({ theme }) => theme.colorBorder};
   align-items: center;
 `;
 
@@ -75,12 +67,12 @@ const OpenButton = styled(Button)<{$pinned: boolean}>`
   padding: ${$2xlPadding};
   border-radius: ${appsButtonsBorderRadius} 0px 0px ${appsButtonsBorderRadius};
 
-  ${({ $pinned }) => ($pinned ? `
-    background-color: ${colorPrimary};
-    color: ${colorWhite};
+  ${({ $pinned, theme }) => ($pinned ? `
+    background-color: ${theme.colorPrimary};
+    color: ${theme.colorWhite};
   ` : `
-    background-color: ${colorBlueAux};
-    color: ${colorPrimary};
+    background-color: ${theme.colorBlueAux};
+    color: ${theme.colorPrimary};
   `)}
 
   > i {
@@ -100,13 +92,14 @@ const ClickableArea = styled.div`
 
   &:hover > ${OpenButton} {
     filter: brightness(90%);
-    background-color: ${colorPrimary};
-    color: ${colorWhite};
+
+    background-color: ${({ theme }) => theme.colorPrimary};
+    color: ${({ theme }) => theme.colorWhite};
   }
 `;
 
 const PinApp = styled.div<{pinned: boolean}>`
-  color: ${colorPrimary};
+  color: ${({ theme }) => theme.colorPrimary};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -118,11 +111,13 @@ const PinApp = styled.div<{pinned: boolean}>`
 
   > i {
     font-size: 120%;
-    color: ${({ pinned }) => (pinned ? colorPrimary : unpinnedAppIconColor)};
+
+    color: ${({ pinned, theme }) => (pinned ? theme.colorPrimary : theme.unpinnedAppIconColor)};
   }
 
   &:hover {
-    background-color: ${appsGalleryOutlineColor};
+
+    background-color: ${({ theme }) => theme.appsGalleryOutlineColor};
   }
 `;
 
@@ -135,8 +130,8 @@ const BoldText = styled.span`
 `;
 
 const NewLabel = styled.span`
-  background-color: ${colorPrimary};
-  color: ${colorWhite};
+  background-color: ${({ theme }) => theme.colorPrimary};
+  color: ${({ theme }) => theme.colorWhite};
   padding: 0.1rem 0.75rem;
   border-radius: 10px;
   font-size: ${fontSizeBase};

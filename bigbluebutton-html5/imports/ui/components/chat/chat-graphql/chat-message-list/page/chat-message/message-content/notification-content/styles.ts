@@ -1,10 +1,9 @@
 import styled from 'styled-components';
 import BaseIcon from '/imports/ui/components/common/icon/component';
-import { colorGray } from '/imports/ui/stylesheets/styled-components/palette';
 import { $3xlPadding, smPadding } from '/imports/ui/stylesheets/styled-components/general';
 
 export const Root = styled.div`
-  color: ${colorGray};
+  color: ${({ theme }) => theme.colorText};
   padding: 0 ${$3xlPadding};
   width: 100%;
   text-align: center;

@@ -1,9 +1,5 @@
 import styled from 'styled-components';
 import Button from '/imports/ui/components/common/button/component';
-import {
-  colorDanger, colorWhite, colorGrayUserListToolbar, colorPrimary, appsGalleryOutlineColor,
-  colorText, colorGrayIcons, appsPanelTextColor,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import { lgBorderRadius } from '/imports/ui/stylesheets/styled-components/general';
 import { fontSizeBase, headingsFontWeight } from '/imports/ui/stylesheets/styled-components/typography';
 import ExpandCircleDownIcon from '@mui/icons-material/ExpandCircleDown';
@@ -16,7 +12,7 @@ const Overlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%; 
+  width: 100%;
   height: 100%;
   background: transparent;
   z-index: 1000;
@@ -35,16 +31,16 @@ const ConfirmationButton = styled(Button)`
   border-radius: ${lgBorderRadius};
   font-size: 1rem;
 
-  ${({ color }) => color === 'danger' && `
-    border: 1px solid ${colorDanger};
+  ${({ color, theme }) => color === 'danger' && `
+    border: 1px solid ${theme.colorDanger};
   `}
 
   &:hover {
     opacity: 0.8;
   }
 
-  i { 
-    font-size: 1.5rem; 
+  i {
+    font-size: 1.5rem;
   }
 `;
 
@@ -56,7 +52,7 @@ const ModalContainer = styled.div<{
   reducedWidth?: boolean,
 }>`
   position: fixed;
-  background: ${colorWhite};
+  background: ${({ theme }) => theme.colorWhite};
   box-shadow: -4px 4px 8px 0px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
@@ -88,12 +84,13 @@ const HeaderContainer = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
-  border-bottom: 1px solid ${appsGalleryOutlineColor};
+  border-bottom: 1px solid ${({ theme }) => theme.appsGalleryOutlineColor};
 
   h2 {
     margin: 0;
     font-size: ${fontSizeBase};
     font-weight: ${headingsFontWeight};
+    color: ${({ theme }) => theme.colorText};
     text-transform: uppercase;
   }
 `;
@@ -119,7 +116,7 @@ const MediaGrid = styled.div<{ isMobile: boolean }>`
 // Footer container for the start/stop sharing button.
 const FooterContainer = styled.div`
   padding: 1rem;
-  border-top: 1px solid ${appsGalleryOutlineColor};
+  border-top: 1px solid ${({ theme }) => theme.appsGalleryOutlineColor};
   display: flex;
   justify-content: center;
 `;
@@ -139,12 +136,12 @@ const SubHeader = styled.div`
 
 const BackButtonIcon = styled(ExpandCircleDownIcon)`
   transform: rotate(90deg);
-  color: ${colorPrimary};
+  color: ${({ theme }) => theme.colorPrimary};
 `;
 
 const SubHeaderTitle = styled.span`
   font-size: 1.1rem;
-  color: ${appsPanelTextColor};
+  color: ${({ theme }) => theme.colorText};
   margin-left: 0.5rem;
   flex-grow: 1;
   text-align: left;
@@ -156,15 +153,15 @@ const SubHeaderIconContainer = styled.div`
   justify-content: center;
   margin-left: auto; /* Pushes icon to the far right of the title's flex space */
   margin-right: 0.5rem;
-  color: ${colorGrayIcons};
-  i { 
-    font-size: 1.5rem; 
-    line-height: 1; 
+  color: ${({ theme }) => theme.colorGrayLabel};
+  i {
+    font-size: 1.5rem;
+    line-height: 1;
   }
 `;
 
 const SubViewContent = styled.div`
-  text-align: center; 
+  text-align: center;
 
   p {
     margin-bottom: 16px;
@@ -181,8 +178,8 @@ const SubViewContentText = styled.div`
   gap: 1rem;
   flex: 1 0 0;
   border-radius: 0.5rem;
-  border: 1px dashed ${colorPrimary};
-  background: ${colorGrayUserListToolbar};
+  border: 1px dashed ${({ theme }) => theme.colorPrimary};
+  background: ${({ theme }) => theme.colorOffWhite};
 `;
 
 const BecomePresenterViewContainer = styled.div`
@@ -200,7 +197,7 @@ const BecomePresenterViewContainer = styled.div`
 `;
 
 const BecomePresenterText = styled.div`
-  color: ${colorText};
+  color: ${({ theme }) => theme.colorText};
 `;
 
 export default {

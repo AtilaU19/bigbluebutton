@@ -11,17 +11,6 @@ import {
   fontSizeSmall,
   fontSizeSmaller,
 } from '/imports/ui/stylesheets/styled-components/typography';
-
-import {
-  colorBlueLightest,
-  colorGrayLight,
-  colorGrayLightest,
-  colorGrayDark,
-  colorWhite,
-  emphasizedMessageBackgroundColor,
-  highlightedMessageBorderColor,
-  systemMessageBorderColor,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import { ChatTime as ChatTimeBase } from './message-header/styles';
 import UserAvatar from '/imports/ui/components/user-avatar/component';
 
@@ -62,14 +51,14 @@ export const ChatWrapper = styled.div<ChatWrapperProps>`
     direction: rtl;
   }
 
-  ${({ isPresentationUpload }) => isPresentationUpload && `
-      border: 1px solid ${systemMessageBorderColor};
+  ${({ isPresentationUpload, theme }) => isPresentationUpload && `
+      border: 1px solid ${theme.systemMessageBorderColor};
       border-radius: 8px;
-      background-color: ${colorWhite};
+      background-color: ${theme.colorWhite};
     `}
-  ${({ isSystemSender }) => isSystemSender && `
-    background-color: #fef9f1;
-    border-left: 2px solid #f5c67f;
+  ${({ isSystemSender, theme }) => isSystemSender && `
+    background-color: ${theme.highlightedMessageBackgroundColor};
+    border-left: 2px solid ${theme.highlightedMessageBorderColor};
     border-radius: 0px 3px 3px 0px;
     padding: 8px 2px;
   `}
@@ -87,32 +76,32 @@ export const ChatContent = styled.div<ChatContentProps>`
   position: relative;
   border: 1px solid transparent;
 
-  ${({ $isSystemSender }) => !$isSystemSender && `
-    background-color: #f4f6fa;
+  ${({ $isSystemSender, theme }) => !$isSystemSender && `
+    background-color: ${theme.colorGrayUserListToolbar};
   `}
 
-  ${({ $highlight }) => $highlight && `
+  ${({ $highlight, theme }) => $highlight && `
     &:hover {
-      border: 1px solid ${highlightedMessageBorderColor};
+      border: 1px solid ${theme.highlightedMessageBorderColor};
     }
   `}
 
   ${({
-    $editing, $reactionPopoverIsOpen, $keyboardFocused,
+    $editing, $reactionPopoverIsOpen, $keyboardFocused, theme,
   }) => ($reactionPopoverIsOpen || $editing || $keyboardFocused)
     && `
-    background-color: ${colorBlueLightest} !important;
+    background-color: ${theme.colorBlueLightest} !important;
   `}
 
   .chat-message-container:focus & {
-    background-color: ${colorBlueLightest} !important;
+    background-color: ${({ theme }) => theme.colorBlueLightest} !important;
   }
 
-  ${({ $emphasizedMessage }) => $emphasizedMessage && `
-    background-color: ${emphasizedMessageBackgroundColor};
+  ${({ $emphasizedMessage, theme }) => $emphasizedMessage && `
+    background-color: ${theme.colorMessageBackground};
 
     &:hover {
-      border: 1px solid ${highlightedMessageBorderColor};
+      border: 1px solid ${theme.highlightedMessageBorderColor};
     }
   `}
 `;
@@ -177,9 +166,9 @@ export const MessageItemWrapper = styled.div`
 `;
 
 export const DeleteMessage = styled.span`
-  color: ${colorGrayLight};
+  color: ${({ theme }) => theme.colorGrayLight};
   padding: ${mdPadding} ${xlPadding};
-  border: 1px solid ${colorGrayLightest};
+  border: 1px solid ${({ theme }) => theme.colorGrayLightest};
   border-radius: 0.375rem;
 `;
 
@@ -188,7 +177,7 @@ export const ChatHeading = styled.div`
 `;
 
 export const EditLabel = styled.span`
-  color: ${colorGrayLight};
+  color: ${({ theme }) => theme.colorGrayLight};
   font-style: italic;
   font-size: 75%;
   display: flex;
@@ -199,7 +188,7 @@ export const EditLabel = styled.span`
 
 export const ChatTime = styled(ChatTimeBase)`
   font-style: italic;
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   display: none;
 
   .chat-message-container:focus &,

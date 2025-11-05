@@ -3,14 +3,6 @@ import {
   smPaddingX,
 } from '/imports/ui/stylesheets/styled-components/general';
 import { smallOnly } from '/imports/ui/stylesheets/styled-components/breakpoints';
-import {
-  colorGrayDark,
-  colorPrimary,
-  colorText,
-  colorWhite,
-  settingsModalTabSelected,
-  colorBorder,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import { fontSizeLarge, titlesFontWeight, textFontWeight } from '/imports/ui/stylesheets/styled-components/typography';
 import {
   Tab, Tabs, TabList, TabPanel,
@@ -45,8 +37,8 @@ const SettingsTabList = styled(TabList)`
   display: flex;
   flex-flow: column;
   margin: 0;
-  border-top: 1px solid ${colorBorder};
-  border-bottom: 1px solid ${colorBorder};
+  border-top: 1px solid ${({ theme }) => theme.colorBorder};
+  border-bottom: 1px solid ${({ theme }) => theme.colorBorder};
   padding: 0;
   width: calc(100% / 3);
   height: 39rem;
@@ -72,7 +64,7 @@ const SettingsTabSelector = styled(Tab)`
   font-size: 1rem;
   flex: none;
   padding: 1rem;
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   cursor: pointer;
   border-radius: 10px;
   margin: 1rem 1.5rem;
@@ -92,7 +84,7 @@ const SettingsTabSelector = styled(Tab)`
     font-size: 0.85rem;
     min-height: 3rem;
     border-radius: 8px;
-    background: ${colorWhite};
+    background: ${({ theme }) => theme.colorWhite};
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: all 0.2s ease;
     margin: 0 2px;
@@ -109,8 +101,8 @@ const SettingsTabSelector = styled(Tab)`
     }
 
     &.is-selected {
-      background: ${colorPrimary};
-      color: ${colorWhite};
+      background: ${({ theme }) => theme.colorPrimary};
+      color: ${({ theme }) => theme.colorWhite};
       z-index: 2;
       transform: scale(1.02);
     }
@@ -124,8 +116,8 @@ const SettingsTabSelector = styled(Tab)`
   }
 
   &.is-selected {
-    color: ${colorText};
-    background-color: ${settingsModalTabSelected};
+    color: ${({ theme }) => theme.colorText};
+    background-color: ${({ theme }) => theme.settingsModalTabSelected};
     font-weight: bold;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   }
@@ -144,9 +136,9 @@ const SettingsTabPanel = styled(TabPanel)`
   display: none;
   flex-grow: 1;
   padding: 1.5rem 3rem;
-  border-top: 1px solid ${colorBorder};
-  border-left: 1px solid ${colorBorder};
-  border-bottom: 1px solid ${colorBorder};
+  border-top: 1px solid ${({ theme }) => theme.colorBorder};
+  border-left: 1px solid ${({ theme }) => theme.colorBorder};
+  border-bottom: 1px solid ${({ theme }) => theme.colorBorder};
   width: calc(100% / 3 * 2);
 
   [dir="rtl"] & {
@@ -174,7 +166,7 @@ const ActionsContainer = styled.div`
   justify-content: flex-end;
   gap: 1.5rem;
   padding: 1.5rem;
-  border-top: 1px solid ${colorBorder};
+  border-top: 1px solid ${({ theme }) => theme.colorBorder};
 
   @media ${smallOnly} {
     padding: 1rem;
@@ -195,15 +187,15 @@ const ActionButton = styled.button`
   border-radius: 1rem;
   cursor: pointer;
   font-size: 16px;
-  color: #fff;
+  color: ${({ theme }) => theme.colorWhite};
 
   &:first-child {
-    background-color: transparent; 
-    color: #ccc;
+    background-color: transparent;
+    color: ${({ theme }) => theme.colorGrayLight};
   }
 
   &:last-child {
-    background-color: ${colorPrimary};
+    background-color: ${({ theme }) => theme.colorPrimary};
   }
 
   &:hover {
@@ -211,7 +203,7 @@ const ActionButton = styled.button`
   }
 
   &:disabled {
-    background-color: #aaa;
+    background-color: ${({ theme }) => theme.colorGrayLighter};
     cursor: not-allowed;
   }
 `;

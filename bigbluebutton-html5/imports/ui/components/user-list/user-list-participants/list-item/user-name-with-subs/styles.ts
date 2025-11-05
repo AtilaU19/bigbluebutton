@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { colorGrayDark, colorGrayIcons } from '/imports/ui/stylesheets/styled-components/palette';
 import { smPaddingX } from '/imports/ui/stylesheets/styled-components/general';
 import { textFontWeight, titlesFontWeight } from '/imports/ui/stylesheets/styled-components/typography';
 import Icon from '/imports/ui/components/common/icon/icon-ts/component';
@@ -25,7 +24,7 @@ const UserName = styled.span`
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 400;
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorTextBlack};
   display: flex;
   flex-direction: row;
 
@@ -43,7 +42,7 @@ const UserNameSub = styled.span`
   margin: 0;
   font-size: 0.75rem;
   font-weight: 400;
-  color: ${colorGrayIcons};
+  color: ${({ theme }) => theme.colorGrayIcons};
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -1,12 +1,6 @@
 import styled from 'styled-components';
 import { Select, ButtonBase } from '@mui/material';
 import {
-  colorGrayDark,
-  colorWhite,
-  btnPrimaryBg,
-  colorOffWhite,
-} from '../../../stylesheets/styled-components/palette';
-import {
   fontSizeBase,
   textFontWeight,
 } from '../../../stylesheets/styled-components/typography';
@@ -16,7 +10,7 @@ import {
 
 export const GuestManagementContainer = styled.div`
   border-radius: ${contentSidebarBorderRadius};
-  background: ${colorWhite};
+  background-color: ${({ theme }) => theme.colorBackgroundComponent};
 `;
 
 export const ClickableArea = styled.div`
@@ -30,7 +24,7 @@ export const ClickableArea = styled.div`
   width: fit-content;
 
   &:focus-within {
-    outline: 2px solid ${colorGrayDark};
+    outline: 2px solid ${({ theme }) => theme.colorGrayDark};
     outline-offset: -2px;
   }
 `;
@@ -44,7 +38,7 @@ export const ToggleButton = styled(ButtonBase)`
   border-radius: ${contentSidebarBorderRadius};
 
   &:focus {
-    outline: 2px solid ${colorOffWhite};
+    outline: 2px solid ${({ theme }) => theme.colorOffWhite};
     border-radius: ${contentSidebarBorderRadius};
     outline-offset: -2px;
   }
@@ -69,10 +63,10 @@ export const ExpandIcon = styled.div<{ $expanded: boolean }>`
   transition: all 0.3s ease;
   margin-right: 0.75rem;
   border-radius: 50%;
-  background-color: ${btnPrimaryBg};
+  background-color: ${({ theme }) => theme.btnPrimaryBg};
 
   svg {
-    color: ${colorWhite};
+    color: ${({ theme }) => theme.colorWhite};
     font-size: 1.25rem;
     transition: transform 0.3s ease;
   }
@@ -85,7 +79,7 @@ export const ExpandIcon = styled.div<{ $expanded: boolean }>`
 export const TitleText = styled.span`
   font-size: ${fontSizeBase};
   font-weight: ${textFontWeight};
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorText};
   overflow: hidden;
   text-overflow: ellipsis;
 `;
@@ -98,8 +92,8 @@ export const CircleButton = styled.div`
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  background-color: ${btnPrimaryBg};
-  
+  background-color: ${({ theme }) => theme.btnPrimaryBg};
+
   &:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
@@ -136,7 +130,7 @@ export const GuestPolicySelector = styled(Select)`
   border-radius: 0.5rem !important;
   width: 100%;
   fieldset {
-    border-color: ${colorGrayDark} !important;
+    border-color: ${({ theme }) => theme.colorGrayDark} !important;
   }
 `;
 

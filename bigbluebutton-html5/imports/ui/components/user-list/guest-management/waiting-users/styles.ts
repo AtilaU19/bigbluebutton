@@ -84,7 +84,7 @@ const UserName = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: initial;
-  color: ${colorGray};
+  color: ${({ theme }) => theme.colorText};
   font-weight: ${textFontWeight};
   line-height: 120%;
 `;
@@ -95,7 +95,7 @@ const PendingUsers = styled.div`
 `;
 
 const MainTitle = styled.div`
-  color: ${colorGray};
+  color: ${({ theme }) => theme.colorText};
   font-weight: ${textFontWeight};
   flex: 1 0 0;
 `;
@@ -113,7 +113,7 @@ const Users = styled.div`
 `;
 
 const Panel = styled.div<PanelProps>`
-  background-color: ${colorWhite};
+  background-color: ${({ theme }) => theme.colorBackgroundComponent};
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -163,7 +163,7 @@ const GuestNumberIndicator = styled.div`
 const GuestOptionsContainer = styled.div`
   flex-shrink: 0;
   display: flex;
-  background: #F4F6FA;
+  background: ${({ theme }) => theme.colorOffWhite};
   padding: 0.25rem 0.5rem;
   align-items: center;
   border-radius: 1.5rem;
@@ -219,7 +219,7 @@ const GuestLobbyMessageContainer = styled.div`
 
 const SwitchTitle = styled(FormControlLabel)`
   .MuiFormControlLabel-label {
-    color: ${colorText};
+    color: ${({ theme }) => theme.colorText};
     font-size: ${fontSizeBase};
     font-weight: ${textFontWeight};
     line-height: normal;
@@ -320,7 +320,7 @@ const Input = styled(TextareaAutosize)`
   }
 
   &:focus {
-    color: ${colorText};
+    color: ${({ theme }) => theme.colorText};
   }
 
   &:disabled,
@@ -344,12 +344,12 @@ const InputWrapper = styled.div`
 
 const NoMessageText = styled.div`
   padding-left: 2.5rem;
-  color: ${colorText};
+  color: ${({ theme }) => theme.colorText};
   font-size: ${fontSizeSmall};
 `;
 
 const GuestLobbyMessage = styled.div`
-  color: ${colorText};
+  color: ${({ theme }) => theme.colorText};
   font-size: ${fontSizeSmall};
   font-style: italic;
 `;
@@ -403,7 +403,7 @@ export const ExpandIcon = styled.div<{ $expanded: boolean }>`
 export const TitleText = styled.span`
   font-size: ${fontSizeBase};
   font-weight: ${textFontWeight};
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorTextBlack};
   overflow: hidden;
   text-overflow: ellipsis;
   padding-right: 1rem;

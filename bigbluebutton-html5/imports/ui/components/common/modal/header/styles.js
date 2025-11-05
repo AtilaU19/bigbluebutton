@@ -3,11 +3,6 @@ import Button from '/imports/ui/components/common/button/component';
 import { TitleElipsis } from '/imports/ui/stylesheets/styled-components/placeholders';
 import { smallOnly } from '/imports/ui/stylesheets/styled-components/breakpoints';
 import {
-  colorGrayDark,
-  colorGrayLighter,
-  colorText,
-} from '/imports/ui/stylesheets/styled-components/palette';
-import {
   mdPaddingX,
   borderSize,
 } from '/imports/ui/stylesheets/styled-components/general';
@@ -34,9 +29,9 @@ const Header = styled.header`
     grid-template-rows: min-content min-content;
   `}
 
-  ${({ $hideBorder }) => !$hideBorder && `
+  ${({ $hideBorder, theme }) => !$hideBorder && `
     padding: calc(${lineHeightComputed} / 2) 0;
-    border-bottom: ${borderSize} solid ${colorGrayLighter};
+    border-bottom: ${borderSize} solid ${theme.colorGrayLighter};
   `}
 `;
 
@@ -44,7 +39,7 @@ const Title = styled(TitleElipsis)`
   display: flex;
   align-items: center;
   font-size: ${fontSizeBase};
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   white-space: normal;
   margin: 0;
   font-weight: ${headingsFontWeight};
@@ -60,7 +55,7 @@ const Title = styled(TitleElipsis)`
     grid-area: 1 / 1 / 2 / 3;
   `}
 
-  ${({ $innerHeader }) => $innerHeader && `
+  ${({ $InnerHeader }) => $InnerHeader && `
     grid-area: 2 / 1 / 3 / 2;
   `}
 
@@ -74,14 +69,14 @@ const DismissButton = styled(Button)`
     border-color: transparent;
     background-color: transparent;
 
-    & > i { color: ${colorText}; }
+    & > i { color: ${({ theme }) => theme.colorText}; }
   }
 
   ${({ $headerOnTop }) => $headerOnTop && `
     grid-area: 1 / 2 / 2 / 3;
   `}
 
-  ${({ $innerHeader }) => $innerHeader && `
+  ${({ $InnerHeader }) => $InnerHeader && `
     grid-area: 1 / 1 / 2 / 2;
   `}
 

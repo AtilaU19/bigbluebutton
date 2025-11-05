@@ -1,9 +1,8 @@
 import styled from 'styled-components';
-import { colorGrayIcons, colorGrayUserListToolbar } from '/imports/ui/stylesheets/styled-components/palette';
 
 const ToolbarContainer = styled.div`
   border-radius: 1.5rem;
-  background-color: ${colorGrayUserListToolbar};
+  background-color: ${({ theme }) => theme.colorOffWhite};;
   display: flex;
   gap: 0.5rem;
   padding: 0.25rem 1rem;
@@ -12,7 +11,7 @@ const ToolbarContainer = styled.div`
 
 const ToolbarItem = styled.div<{ disabled?: boolean }>`
   cursor: pointer;
-  color: ${colorGrayIcons};
+  color: ${({ theme }) => theme.colorGrayIcons};
 
   ${({ disabled }) => disabled && `
     cursor: not-allowed;
@@ -21,11 +20,11 @@ const ToolbarItem = styled.div<{ disabled?: boolean }>`
 
 const MoreItems = styled.div`
   cursor: pointer;
-  color: ${colorGrayIcons};
+  color: ${({ theme }) => theme.colorGrayIcons};
 `;
 
 const Pipe = styled.span`
-  color: ${colorGrayIcons};
+  color: ${({ theme }) => theme.colorGrayIcons};
 `;
 
 export default {

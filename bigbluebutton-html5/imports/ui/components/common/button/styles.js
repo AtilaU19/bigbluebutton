@@ -23,40 +23,6 @@ import {
   fontSizeLarge,
   btnFontWeight,
 } from '/imports/ui/stylesheets/styled-components/typography';
-import {
-  btnDefaultColor,
-  btnDefaultBg,
-  btnDefaultGhostColor,
-  btnDefaultGhostBg,
-  btnDefaultGhostActiveBg,
-  btnDefaultGhostBorder,
-  btnPrimaryBorder,
-  btnPrimaryColor,
-  btnPrimaryBg,
-  btnPrimaryHoverBg,
-  btnPrimaryActiveBg,
-  btnSuccessBorder,
-  btnSuccessColor,
-  btnSuccessBg,
-  btnWarningBorder,
-  btnWarningColor,
-  btnWarningBg,
-  btnDangerBorder,
-  btnDangerColor,
-  btnDangerBg,
-  btnDangerBgHover,
-  btnDarkBorder,
-  btnDarkColor,
-  btnDarkBg,
-  btnOfflineBorder,
-  btnOfflineColor,
-  btnOfflineBg,
-  btnMutedBorder,
-  btnMutedColor,
-  btnMutedBg,
-  colorWhite,
-  colorGray,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import BaseButton from './base/component';
 
 const ButtonIcon = styled(Icon)`
@@ -230,59 +196,61 @@ const ButtonWrapper = styled(BaseButton)`
     padding: ${jumboPaddingY} ${jumboPaddingX};
   `}
 
-  ${({ size, circle, color }) => size === 'lg' && circle && color === 'primary' && `
+  ${({
+    size, circle, color, theme,
+  }) => size === 'lg' && circle && color === 'primary' && `
     &:focus:not([aria-disabled="true"]){
       & > span{
-        color: ${btnPrimaryColor};
-        background-color: ${btnPrimaryBg};
+        color: ${theme.btnPrimaryColor};
+        background-color: ${theme.btnPrimaryBg};
         background-clip: padding-box;
-        box-shadow: 0 0 0 ${borderSize} ${btnPrimaryBorder};
+        box-shadow: 0 0 0 ${borderSize} ${theme.btnPrimaryBorder};
       }
     }
 
     &:hover{
       & > span{
         filter: brightness(90%);
-        color: ${btnPrimaryColor};
-        background-color: ${btnPrimaryHoverBg} !important;
+        color: ${theme.btnPrimaryColor};
+        background-color: ${theme.btnPrimaryHoverBg} !important;
       }
     }
 
     &:active:focus{
       & > span{
         filter: brightness(85%);
-        color: ${btnPrimaryColor};
-        background-color: ${btnPrimaryActiveBg};
+        color: ${theme.btnPrimaryColor};
+        background-color: ${theme.btnPrimaryActiveBg};
       }
     }
 
     &:active{
       & > span{
         filter: brightness(85%);
-        color: ${btnPrimaryColor};
-        background-color: ${btnPrimaryActiveBg};
+        color: ${theme.btnPrimaryColor};
+        background-color: ${theme.btnPrimaryActiveBg};
       }
     }
   `}
 
   ${({
-    size, circle, ghost, color,
+    size, circle, ghost, color, theme,
   }) => size === 'lg' && circle && ghost && color === 'default' && `
     span {
-      box-shadow: 0 0 1px 0px ${btnDefaultGhostColor} inset, 0 0 1px 0px ${btnDefaultGhostColor};
+      box-shadow: 0 0 1px 0px ${theme.btnDefaultGhostColor} inset, 0 0 1px 0px ${theme.btnDefaultGhostColor};
       background-color: transparent !important;
-      border-color: ${btnDefaultGhostColor} !important;
+      border-color: ${theme.btnDefaultGhostColor} !important;
     }
 
     & > span{
-      color: ${btnDefaultGhostColor};
+      color: ${theme.btnDefaultGhostColor};
     }
 
     &:focus:not([aria-disabled="true"]){
       & > span{
-        background-color: ${btnDefaultGhostBg} !important;
+        background-color: ${theme.btnDefaultGhostBg} !important;
         background-clip: padding-box;
-        box-shadow: 0 0 0 ${borderSize} ${btnDefaultGhostBorder};
+        box-shadow: 0 0 0 ${borderSize} ${theme.btnDefaultGhostBorder};
         border-color: transparent !important;
       }
     }
@@ -290,21 +258,21 @@ const ButtonWrapper = styled(BaseButton)`
     &:hover{
       & > span{
         filter: brightness(85%);
-        background-color: ${btnDefaultGhostBg} !important;
+        background-color: ${theme.btnDefaultGhostBg} !important;
       }
     }
 
     &:active:focus{
       & > span{
         filter: brightness(85%);
-        background-color: ${btnDefaultGhostActiveBg} !important;
+        background-color: ${theme.btnDefaultGhostActiveBg} !important;
       }
     }
 
     &:active{
       & > span{
         filter: brightness(85%);
-        background-color: ${btnDefaultGhostActiveBg};
+        background-color: ${theme.btnDefaultGhostActiveBg};
       }
     }
   `}
@@ -315,13 +283,15 @@ const ButtonWrapper = styled(BaseButton)`
       background-color: transparent;
     }
   `}
-  ${({ loading, animations }) => loading && animations && `
+  ${({
+    loading, animations, theme,
+  }) => loading && animations && `
   &::before {
     position: relative;
     border: 5px solid transparent;
     border-radius: 50%;
-    background-color: #3498db;
-    color: white;
+    background-color: ${theme.colorPrimary};
+    color: ${theme.colorWhite};
     font-size: 16px;
     text-align: center;
     line-height: 90px;
@@ -335,7 +305,7 @@ const ButtonWrapper = styled(BaseButton)`
     right: 0;
     bottom: 0;
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid ${theme.colorWhite};
     border-top-color: transparent;
     animation: spin 1.5s ease infinite;
   }
@@ -395,7 +365,7 @@ const ButtonSpan = styled.span`
     outline-width: ${borderSize};
     text-decoration: none;
     ${({ hoverColor }) => hoverColor
-      && `background-color: ${hoverColor};`}
+      && `background-color: ${hoverColor} !important;`}
   }
 
   &:active,
@@ -447,366 +417,368 @@ const ButtonSpan = styled.span`
     padding: ${jumboPaddingY} ${jumboPaddingX};
   `}
 
-  ${({ size, color }) => size === 'md' && color === 'light' && `
-    color: ${colorGray};
-    
+  ${({ size, color, theme }) => size === 'md' && color === 'light' && `
+    color: ${theme.colorGray};
+
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${colorGray};
-      box-shadow: 0 0 0 1px #CDD6E0 !important;
-      background-color: #DCE4EC !important;
+      color: ${theme.colorGray};
+      box-shadow: 0 0 0 1px ${theme.colorGrayLightest} !important;
+      background-color: ${theme.colorBlueAux} !important;
     }
-    
+
     &:hover {
-      color: hsl(210, 13%, 20%) !important;
-      background-color: #DCE4EC !important;
+      color: ${theme.colorGrayDark} !important;
+      background-color: ${theme.colorBlueAux} !important;
     }
 
     &:active {
-      color: hsl(210, 13%, 20%) !important;
-      background-color: hsl(210, 30%, 80%) !important;
+      color: ${theme.colorGrayDark} !important;
+      background-color: ${theme.colorGrayLightest} !important;
     }
 
     &:focus:hover {
-      color: hsl(210, 13%, 20%) !important;
-      box-shadow: 0 0 0 1px #CDD6E0 !important;
-      background-color: #DCE4EC !important;
+      color: ${theme.colorGrayDark} !important;
+      box-shadow: 0 0 0 1px ${theme.colorGrayLightest} !important;
+      background-color: ${theme.colorBlueAux} !important;
     }
 
     &:focus:active {
-      color: hsl(210, 13%, 20%) !important;
-      box-shadow: 0 0 0 1px #CDD6E0 !important;
-      background-color: hsl(210, 30%, 80%) !important;
+      color: ${theme.colorGrayDark} !important;
+      box-shadow: 0 0 0 1px ${theme.colorGrayLightest} !important;
+      background-color: ${theme.colorGrayLightest} !important;
     }
   `}
 
-  ${({ size, color }) => size === 'md' && color === 'dark' && `
-    color: ${colorWhite};
+  ${({ size, color, theme }) => size === 'md' && color === 'dark' && `
+    color: ${theme.colorWhite};
     background: none !important;
-    
+
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${colorWhite};
-      box-shadow: 0 0 0 1px ${btnDefaultGhostBorder} !important;
-      background-color: ${btnDefaultGhostBg} !important;
+      color: ${theme.colorWhite};
+      box-shadow: 0 0 0 1px ${theme.btnDefaultGhostBorder} !important;
+      background-color: ${theme.btnDefaultGhostBg} !important;
     }
-    
+
     &:hover {
-      color: hsl(0, 0%, 85%) !important;
-      background-color: ${btnDefaultGhostBg} !important;
+      color: ${theme.colorGrayLighter} !important;
+      background-color: ${theme.btnDefaultGhostBg} !important;
     }
 
     &:active {
-      color: hsl(0, 0%, 85%) !important;
-      background-color: ${btnDefaultGhostActiveBg} !important;
+      color: ${theme.colorGrayLighter} !important;
+      background-color: ${theme.btnDefaultGhostActiveBg} !important;
     }
 
     &:focus:hover {
-      color: hsl(0, 0%, 85%) !important;
-      box-shadow: 0 0 0 1px ${btnDefaultGhostBorder} !important;
-      background-color: ${btnDefaultGhostBg} !important;
+      color: ${theme.colorGrayLighter} !important;
+      box-shadow: 0 0 0 1px ${theme.btnDefaultGhostBorder} !important;
+      background-color: ${theme.btnDefaultGhostBg} !important;
     }
 
     &:focus:active {
-      color: hsl(0, 0%, 85%) !important;
-      box-shadow: 0 0 0 1px ${btnDefaultGhostBorder} !important;
-      background-color: ${btnDefaultGhostActiveBg} !important;
+      color: ${theme.colorGrayLighter} !important;
+      box-shadow: 0 0 0 1px ${theme.btnDefaultGhostBorder} !important;
+      background-color: ${theme.btnDefaultGhostActiveBg} !important;
     }
   `}
 
-  ${({ color, ghost }) => color === 'default' && !ghost && `
-    color: ${btnDefaultColor};
-    background-color: ${btnDefaultBg};
+  ${({ color, ghost, theme }) => color === 'default' && !ghost && `
+    color: ${theme.btnDefaultColor};
+    background-color: ${theme.btnDefaultBg};
     border: ${borderSizeLarge} solid transparent;
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnDefaultColor};
-      background-color: ${btnDefaultBg};
+      color: ${theme.btnDefaultColor};
+      background-color: ${theme.btnDefaultBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnPrimaryBg};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnPrimaryBg};
     }
 
     &:hover & {
-      color: ${btnDefaultBg};
+      color: ${theme.btnDefaultBg};
     }
   `}
 
-  ${({ color }) => color === 'primary' && `
-    color: ${btnPrimaryColor};
-    background-color: ${btnPrimaryBg};
+  ${({ color, theme }) => color === 'primary' && `
+    color: ${theme.btnPrimaryColor};
+    background-color: ${theme.btnPrimaryBg};
     border: ${borderSizeLarge} solid transparent;
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnPrimaryColor};
-      background-color: ${btnPrimaryBg};
+      color: ${theme.btnPrimaryColor};
+      background-color: ${theme.btnPrimaryBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnPrimaryBg};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnPrimaryBg};
     }
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnPrimaryColor};
+      color: ${theme.btnPrimaryColor};
     }
-  
+
   `}
 
-  ${({ color }) => color === 'success' && `
-    color: ${btnSuccessColor};
-    background-color: ${btnSuccessBg};
+  ${({ color, theme }) => color === 'success' && `
+    color: ${theme.btnSuccessColor};
+    background-color: ${theme.btnSuccessBg};
     border: ${borderSizeLarge} solid transparent;
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnSuccessColor};
-      background-color: ${btnSuccessBg};
+      color: ${theme.btnSuccessColor};
+      background-color: ${theme.btnSuccessBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnSuccessBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnSuccessBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnSuccessColor};
+      color: ${theme.btnSuccessColor};
     }
   `}
 
-  ${({ color }) => color === 'warning' && `
-    color: ${btnWarningColor};
-    background-color: ${btnWarningBg};
+  ${({ color, theme }) => color === 'warning' && `
+    color: ${theme.btnWarningColor};
+    background-color: ${theme.btnWarningBg};
     border: ${borderSizeLarge} solid transparent;
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnWarningColor};
-      background-color: ${btnWarningBg};
+      color: ${theme.btnWarningColor};
+      background-color: ${theme.btnWarningBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnWarningBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnWarningBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnWarningColor};
+      color: ${theme.btnWarningColor};
     }
   `}
 
-  ${({ color }) => color === 'danger' && `
-    color: ${btnDangerColor};
-    background-color: ${btnDangerBg};
+  ${({ color, theme }) => color === 'danger' && `
+    color: ${theme.btnDangerColor};
+    background-color: ${theme.btnDangerBg};
     border: ${borderSizeLarge} solid transparent;
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnDangerColor};
-      background-color: ${btnDangerBg};
+      color: ${theme.btnDangerColor};
+      background-color: ${theme.btnDangerBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnDangerBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnDangerBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDangerColor};
-      background-color: ${btnDangerBgHover};
+      color: ${theme.btnDangerColor};
+      background-color: ${theme.btnDangerBgHover};
     }
   `}
 
-  ${({ color }) => color === 'dark' && `
-    color: ${btnDarkColor};
-    background-color: ${btnDarkBg};
+  ${({ color, theme }) => color === 'dark' && `
+    color: ${theme.btnDarkColor};
+    background-color: ${theme.btnDarkBg};
     border: ${borderSizeLarge} solid transparent;
 
     &:focus {
-      color: ${btnDarkColor};
-      background-color: ${btnDarkBg};
+      color: ${theme.btnDarkColor};
+      background-color: ${theme.btnDarkBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnDarkBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnDarkBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDarkColor};
+      color: ${theme.btnDarkColor};
     }
   `}
 
-  ${({ color }) => color === 'offline' && `
-    color: ${btnOfflineColor};
-    background-color: ${btnOfflineBg};
+  ${({ color, theme }) => color === 'offline' && `
+    color: ${theme.btnOfflineColor};
+    background-color: ${theme.btnOfflineBg};
     border: ${borderSizeLarge} solid transparent;
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnOfflineColor};
-      background-color: ${btnOfflineBg};
+      color: ${theme.btnOfflineColor};
+      background-color: ${theme.btnOfflineBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnOfflineBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnOfflineBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnOfflineColor};
+      color: ${theme.btnOfflineColor};
     }
   `}
 
-  ${({ color }) => color === 'muted' && `
-    color: ${btnMutedColor};
-    background-color: ${btnMutedBg};
+  ${({ color, theme }) => color === 'muted' && `
+    color: ${theme.btnMutedColor};
+    background-color: ${theme.btnMutedBg};
     border: ${borderSizeLarge} solid transparent;
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnMutedColor};
-      background-color: ${btnMutedBg};
+      color: ${theme.btnMutedColor};
+      background-color: ${theme.btnMutedBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnMutedBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnMutedBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnMutedColor};
+      color: ${theme.btnMutedColor};
     }
   `}
 
-  ${({ ghost, color, size }) => ghost && color === 'default' && size !== 'lg' && `
-    color: ${btnDefaultBg};
+  ${({
+    ghost, color, size, theme,
+  }) => ghost && color === 'default' && size !== 'lg' && `
+    color: ${theme.btnDefaultBg};
     background-image: none;
     background-color: transparent;
     border: ${borderSizeLarge} solid transparent;
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnDefaultBg};
-      background-color: ${btnDefaultColor};
+      color: ${theme.btnDefaultBg};
+      background-color: ${theme.btnDefaultColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnDefaultBg} !important;
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnDefaultBg} !important;
     }
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDefaultBg};
-      background-color: ${btnDefaultColor};
+      color: ${theme.btnDefaultBg};
+      background-color: ${theme.btnDefaultColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'primary' && `
-    color: ${btnPrimaryBg};
+  ${({ ghost, color, theme }) => ghost && color === 'primary' && `
+    color: ${theme.btnPrimaryBg};
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnPrimaryBg};
-      background-color: ${btnPrimaryColor};
+      color: ${theme.btnPrimaryBg};
+      background-color: ${theme.btnPrimaryColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnPrimaryBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnPrimaryBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnPrimaryBg};
-      background-color: ${btnPrimaryColor};
+      color: ${theme.btnPrimaryBg};
+      background-color: ${theme.btnPrimaryColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'success' && `
-    color: ${btnSuccessBg};
+  ${({ ghost, color, theme }) => ghost && color === 'success' && `
+    color: ${theme.btnSuccessBg};
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnSuccessBg};
-      background-color: ${btnSuccessColor};
+      color: ${theme.btnSuccessBg};
+      background-color: ${theme.btnSuccessColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnSuccessBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnSuccessBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnSuccessBg};
-      background-color: ${btnSuccessColor};
+      color: ${theme.btnSuccessBg};
+      background-color: ${theme.btnSuccessColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'warning' && `
-    color: ${btnWarningBg};
+  ${({ ghost, color, theme }) => ghost && color === 'warning' && `
+    color: ${theme.btnWarningBg};
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnWarningBg};
-      background-color: ${btnWarningColor};
+      color: ${theme.btnWarningBg};
+      background-color: ${theme.btnWarningColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnWarningBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnWarningBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnWarningBg};
-      background-color: ${btnWarningColor};
+      color: ${theme.btnWarningBg};
+      background-color: ${theme.btnWarningColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'danger' && `
-    color: ${btnDangerBg};
+  ${({ ghost, color, theme }) => ghost && color === 'danger' && `
+    color: ${theme.btnDangerBg};
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnDangerBg};
-      background-color: ${btnDangerColor};
+      color: ${theme.btnDangerBg};
+      background-color: ${theme.btnDangerColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnDangerBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnDangerBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDangerBg};
-      background-color: ${btnDangerColor};
+      color: ${theme.btnDangerBg};
+      background-color: ${theme.btnDangerColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'dark' && `
-    color: ${btnDarkBg};
+  ${({ ghost, color, theme }) => ghost && color === 'dark' && `
+    color: ${theme.btnDarkBg};
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnDarkBg};
-      background-color: ${btnDarkColor};
+      color: ${theme.btnDarkBg};
+      background-color: ${theme.btnDarkColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnDarkBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnDarkBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDarkBg};
-      background-color: ${btnDarkColor};
+      color: ${theme.btnDarkBg};
+      background-color: ${theme.btnDarkColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'offline' && `
-    color: ${btnOfflineBg};
+  ${({ ghost, color, theme }) => ghost && color === 'offline' && `
+    color: ${theme.btnOfflineBg};
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnOfflineBg};
-      background-color: ${btnOfflineColor};
+      color: ${theme.btnOfflineBg};
+      background-color: ${theme.btnOfflineColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnOfflineBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnOfflineBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnOfflineBg};
-      background-color: ${btnOfflineColor};
+      color: ${theme.btnOfflineBg};
+      background-color: ${theme.btnOfflineColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'muted' && `
-    color: ${btnMutedBg};
+  ${({ ghost, color, theme }) => ghost && color === 'muted' && `
+    color: ${theme.btnMutedBg};
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnMutedBg};
-      background-color: ${btnMutedColor};
+      color: ${theme.btnMutedBg};
+      background-color: ${theme.btnMutedColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnMutedBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnMutedBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnMutedBg};
-      background-color: ${btnMutedColor};
+      color: ${theme.btnMutedBg};
+      background-color: ${theme.btnMutedColor};
     }
   `}
 
@@ -908,359 +880,359 @@ const Button = styled(BaseButton)`
     padding: ${jumboPaddingY} ${jumboPaddingX};
   `}
 
-  ${({ color }) => color === 'default' && `
-    color: ${btnDefaultColor};
-    background-color: ${btnDefaultBg};
+  ${({ color, theme }) => color === 'default' && `
+    color: ${theme.btnDefaultColor};
+    background-color: ${theme.btnDefaultBg};
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnDefaultColor};
-      background-color: ${btnDefaultBg};
+      color: ${theme.btnDefaultColor};
+      background-color: ${theme.btnDefaultBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnPrimaryBg};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnPrimaryBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDefaultColor};
+      color: ${theme.btnDefaultColor};
     }
   `}
 
-  ${({ color }) => color === 'primary' && `
-    color: ${btnPrimaryColor};
-    background-color: ${btnPrimaryBg};
+  ${({ color, theme }) => color === 'primary' && `
+    color: ${theme.btnPrimaryColor};
+    background-color: ${theme.btnPrimaryBg};
     border: ${borderSizeLarge} solid transparent !important;
 
     &:focus:not([aria-disabled="true"]){
-      color: ${btnPrimaryColor};
-      background-color: ${btnPrimaryBg};
+      color: ${theme.btnPrimaryColor};
+      background-color: ${theme.btnPrimaryBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnPrimaryBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnPrimaryBorder};
     }
 
     &:hover{
       filter: brightness(90%);
-      color: ${btnPrimaryColor};
-      background-color: ${btnPrimaryHoverBg} !important;
+      color: ${theme.btnPrimaryColor};
+      background-color: ${theme.btnPrimaryHoverBg} !important;
     }
 
     &:active:focus{
       filter: brightness(85%);
-      color: ${btnPrimaryColor};
-      background-color: ${btnPrimaryActiveBg};
+      color: ${theme.btnPrimaryColor};
+      background-color: ${theme.btnPrimaryActiveBg};
     }
 
     &:active{
       filter: brightness(85%);
-      color: ${btnPrimaryColor};
-      background-color: ${btnPrimaryActiveBg} !important;
+      color: ${theme.btnPrimaryColor};
+      background-color: ${theme.btnPrimaryActiveBg} !important;
     }
   `}
 
-  ${({ color }) => color === 'success' && `
-    color: ${btnSuccessColor};
-    background-color: ${btnSuccessBg};
+  ${({ color, theme }) => color === 'success' && `
+    color: ${theme.btnSuccessColor};
+    background-color: ${theme.btnSuccessBg};
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnSuccessColor};
-      background-color: ${btnSuccessBg};
+      color: ${theme.btnSuccessColor};
+      background-color: ${theme.btnSuccessBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnSuccessBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnSuccessBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnSuccessColor};
+      color: ${theme.btnSuccessColor};
     }
   `}
 
-  ${({ color }) => color === 'warning' && `
-    color: ${btnWarningColor};
-    background-color: ${btnWarningBg};
+  ${({ color, theme }) => color === 'warning' && `
+    color: ${theme.btnWarningColor};
+    background-color: ${theme.btnWarningBg};
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnWarningColor};
-      background-color: ${btnWarningBg};
+      color: ${theme.btnWarningColor};
+      background-color: ${theme.btnWarningBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnWarningBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnWarningBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnWarningColor};
+      color: ${theme.btnWarningColor};
     }
   `}
 
-  ${({ color }) => color === 'danger' && `
-    color: ${btnDangerColor};
-    background-color: ${btnDangerBg};
+  ${({ color, theme }) => color === 'danger' && `
+    color: ${theme.btnDangerColor};
+    background-color: ${theme.btnDangerBg};
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnDangerColor};
-      background-color: ${btnDangerBg};
+      color: ${theme.btnDangerColor};
+      background-color: ${theme.btnDangerBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnDangerBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnDangerBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDangerColor};
+      color: ${theme.btnDangerColor};
     }
   `}
 
-  ${({ color }) => color === 'dark' && `
-    color: ${btnDarkColor};
-    background-color: ${btnDarkBg};
+  ${({ color, theme }) => color === 'dark' && `
+    color: ${theme.btnDarkColor};
+    background-color: ${theme.btnDarkBg};
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnDarkColor};
-      background-color: ${btnDarkBg};
+      color: ${theme.btnDarkColor};
+      background-color: ${theme.btnDarkBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnDarkBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnDarkBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDarkColor};
+      color: ${theme.btnDarkColor};
     }
   `}
 
-  ${({ color }) => color === 'offline' && `
-    color: ${btnOfflineColor};
-    background-color: ${btnOfflineBg};
+  ${({ color, theme }) => color === 'offline' && `
+    color: ${theme.btnOfflineColor};
+    background-color: ${theme.btnOfflineBg};
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnOfflineColor};
-      background-color: ${btnOfflineBg};
+      color: ${theme.btnOfflineColor};
+      background-color: ${theme.btnOfflineBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnOfflineBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnOfflineBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnOfflineColor};
+      color: ${theme.btnOfflineColor};
     }
   `}
 
-  ${({ color }) => color === 'muted' && `
-    color: ${btnMutedColor};
-    background-color: ${btnMutedBg};
+  ${({ color, theme }) => color === 'muted' && `
+    color: ${theme.btnMutedColor};
+    background-color: ${theme.btnMutedBg};
 
     &:focus,
     .buttonWrapper:focus:not([aria-disabled="true"]) & {
-      color: ${btnMutedColor};
-      background-color: ${btnMutedBg};
+      color: ${theme.btnMutedColor};
+      background-color: ${theme.btnMutedBg};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSize} ${btnMutedBorder};
+      box-shadow: 0 0 0 ${borderSize} ${theme.btnMutedBorder};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnMutedColor};
+      color: ${theme.btnMutedColor};
     }
   `}
 
-  ${({ color }) => color === 'secondary' && `
+  ${({ color, theme }) => color === 'secondary' && `
     background: transparent;
-    color: ${colorGray};
+    color: ${theme.colorGray};
     border: 3px solid transparent;
     border-radius: 4px;
-  
+
 
     &:focus {
-      background: hsl(210, 30%, 95%);
-      box-shadow: 0 0 0 ${borderSize} hsl(211, 87%, 80%);
+      background: ${theme.colorMutedBackground};
+      box-shadow: 0 0 0 ${borderSize} ${theme.colorBlueLighter};
     }
 
     &:hover {
-      background: hsl(210, 30%, 95%);
-      color: hsl(210, 13%, 35%);
+      background: ${theme.colorMutedBackground};
+      color: ${theme.colorGrayDark};
     }
 
     &:active {
-      background: hsl(210, 30%, 89%);
-      color: hsl(210, 13%, 30%);
+      background: ${theme.colorGrayLightest};
+      color: ${theme.colorGrayDark};
     }
 
     &:hover {
       &:focus {
-        background: hsl(210, 30%, 95%);
-        color: hsl(210, 13%, 30%);
-        box-shadow: 0 0 0 ${borderSize} hsl(211, 87%, 80%);
+        background: ${theme.colorMutedBackground};
+        color: ${theme.colorGrayDark};
+        box-shadow: 0 0 0 ${borderSize} ${theme.colorBlueLighter};
       }
     }
 
     &:focus {
       &:active {
-        background: hsl(210, 30%, 89%);
-        color: hsl(210, 13%, 30%);
-        box-shadow: 0 0 0 ${borderSize} hsl(211, 87%, 80%);
+        background: ${theme.colorGrayLightest};
+        color: ${theme.colorGrayDark};
+        box-shadow: 0 0 0 ${borderSize} ${theme.colorBlueLighter};
       }
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'default' && `
-    color: ${btnDefaultBg};
+  ${({ ghost, color, theme }) => ghost && color === 'default' && `
+    color: ${theme.btnDefaultBg};
     background-image: none;
     background-color: transparent;
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnDefaultBg};
-      background-color: ${btnDefaultColor};
+      color: ${theme.btnDefaultBg};
+      background-color: ${theme.btnDefaultColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnDefaultBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnDefaultBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDefaultBg};
-      background-color: ${btnDefaultColor};
+      color: ${theme.btnDefaultBg};
+      background-color: ${theme.btnDefaultColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'primary' && `
-    color: ${btnPrimaryBg};
+  ${({ ghost, color, theme }) => ghost && color === 'primary' && `
+    color: ${theme.btnPrimaryBg};
     background-image: none;
     background-color: transparent;
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnPrimaryBg};
-      background-color: ${btnPrimaryColor};
+      color: ${theme.btnPrimaryBg};
+      background-color: ${theme.btnPrimaryColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnPrimaryBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnPrimaryBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnPrimaryBg};
-      background-color: ${btnPrimaryColor};
+      color: ${theme.btnPrimaryBg};
+      background-color: ${theme.btnPrimaryColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'success' && `
-    color: ${btnSuccessBg};
+  ${({ ghost, color, theme }) => ghost && color === 'success' && `
+    color: ${theme.btnSuccessBg};
     background-image: none;
     background-color: transparent;
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnSuccessBg};
-      background-color: ${btnSuccessColor};
+      color: ${theme.btnSuccessBg};
+      background-color: ${theme.btnSuccessColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnSuccessBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnSuccessBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnSuccessBg};
-      background-color: ${btnSuccessColor};
+      color: ${theme.btnSuccessBg};
+      background-color: ${theme.btnSuccessColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'warning' && `
-    color: ${btnWarningBg};
+  ${({ ghost, color, theme }) => ghost && color === 'warning' && `
+    color: ${theme.btnWarningBg};
     background-image: none;
     background-color: transparent;
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnWarningBg};
-      background-color: ${btnWarningColor};
+      color: ${theme.btnWarningBg};
+      background-color: ${theme.btnWarningColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnWarningBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnWarningBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnWarningBg};
-      background-color: ${btnWarningColor};
+      color: ${theme.btnWarningBg};
+      background-color: ${theme.btnWarningColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'danger' && `
-    color: ${btnDangerBg};
+  ${({ ghost, color, theme }) => ghost && color === 'danger' && `
+    color: ${theme.btnDangerBg};
     background-image: none;
     background-color: transparent;
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnDangerBg};
-      background-color: ${btnDangerColor};
+      color: ${theme.btnDangerBg};
+      background-color: ${theme.btnDangerColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnDangerBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnDangerBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDangerBg};
-      background-color: ${btnDangerColor};
+      color: ${theme.btnDangerBg};
+      background-color: ${theme.btnDangerColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'dark' && `
-    color: ${btnDarkBg};
+  ${({ ghost, color, theme }) => ghost && color === 'dark' && `
+    color: ${theme.btnDarkBg};
     background-image: none;
     background-color: transparent;
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnDarkBg};
-      background-color: ${btnDarkColor};
+      color: ${theme.btnDarkBg};
+      background-color: ${theme.btnDarkColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnDarkBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnDarkBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnDarkBg};
-      background-color: ${btnDarkColor};
+      color: ${theme.btnDarkBg};
+      background-color: ${theme.btnDarkColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'offline' && `
-    color: ${btnOfflineBg};
+  ${({ ghost, color, theme }) => ghost && color === 'offline' && `
+    color: ${theme.btnOfflineBg};
     background-image: none;
     background-color: transparent;
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnOfflineBg};
-      background-color: ${btnOfflineColor};
+      color: ${theme.btnOfflineBg};
+      background-color: ${theme.btnOfflineColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnOfflineBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnOfflineBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnOfflineBg};
-      background-color: ${btnOfflineColor};
+      color: ${theme.btnOfflineBg};
+      background-color: ${theme.btnOfflineColor};
     }
   `}
 
-  ${({ ghost, color }) => ghost && color === 'muted' && `
-    color: ${btnMutedBg};
+  ${({ ghost, color, theme }) => ghost && color === 'muted' && `
+    color: ${theme.btnMutedBg};
     background-image: none;
     background-color: transparent;
 
     &:focus,
     .buttonWrapper:focus & {
-      color: ${btnMutedBg};
-      background-color: ${btnMutedColor};
+      color: ${theme.btnMutedBg};
+      background-color: ${theme.btnMutedColor};
       background-clip: padding-box;
-      box-shadow: 0 0 0 ${borderSizeLarge} ${btnMutedBg};
+      box-shadow: 0 0 0 ${borderSizeLarge} ${theme.btnMutedBg};
     }
 
     &:hover,
     .buttonWrapper:hover & {
-      color: ${btnMutedBg};
-      background-color: ${btnMutedColor};
+      color: ${theme.btnMutedBg};
+      background-color: ${theme.btnMutedColor};
     }
   `}
 

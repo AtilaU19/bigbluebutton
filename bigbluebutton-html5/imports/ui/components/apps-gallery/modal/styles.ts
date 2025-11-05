@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import ModalSimple from '/imports/ui/components/common/modal/simple/component';
 import Button from '/imports/ui/components/common/button/component';
-import { appsPanelTextColor } from '/imports/ui/stylesheets/styled-components/palette';
 import {
   lgBorderRadius,
   appsModalButtonPaddingX,
@@ -13,7 +12,7 @@ import { titlesFontWeight } from '/imports/ui/stylesheets/styled-components/typo
 
 const Modal = styled(ModalSimple)`
   padding: ${appsModalPadding} ${appsModalPadding} ${appsModalPaddingBottom} ${appsModalPadding};
-  color: ${appsPanelTextColor};
+  color: ${({ theme }) => theme.appsPanelTextColor};
 `;
 
 const ModalContent = styled.div`
@@ -29,7 +28,7 @@ const Title = styled.div`
   white-space: normal;
   margin: 0px 0px 1rem;
   line-height: calc(2rem);
-  color: ${appsPanelTextColor};
+  color: ${({ theme }) => theme.appsPanelTextColor};
 `;
 
 const SubTitle = styled.div`

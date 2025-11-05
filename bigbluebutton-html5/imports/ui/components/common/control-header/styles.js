@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import { colorText } from '/imports/ui/stylesheets/styled-components/palette';
 import { jumboPaddingY } from '/imports/ui/stylesheets/styled-components/general';
 
 const Header = styled.header`
@@ -14,7 +13,7 @@ const Header = styled.header`
 const RightWrapper = styled.div`
   display: flex;
   align-items: center;
-  
+
   & > div {
     display: flex;
     align-items: center;
@@ -28,7 +27,7 @@ export const Title = styled.h2`
   font-size: 1rem;
   font-weight: 600;
   line-height: normal;
-  color: ${colorText};
+  color: ${({ theme }) => theme.colorText};
   text-transform: uppercase;
 `;
 

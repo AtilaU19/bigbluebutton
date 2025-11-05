@@ -1,10 +1,5 @@
-import styled from 'styled-components';
+import styled, { DefaultTheme } from 'styled-components';
 import Button from '/imports/ui/components/common/button/component';
-import {
-  appsGalleryOutlineColor,
-  colorGrayDark,
-  colorGrayUserListToolbar,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import {
   fontSizeSmall,
   textFontWeight,
@@ -29,7 +24,7 @@ const ActionButtonWrapper = styled.div`
 `;
 
 const ActionButtonLabel = styled.span`
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorText};
   font-size: ${fontSizeSmall};
   font-weight: ${textFontWeight};
   text-align: center;
@@ -45,8 +40,8 @@ const ActionButton = styled<ActionButtonProps>(Button)`
   align-items: center;
   height: 3rem;
   border-radius: 1rem;
-  border: 1px solid ${appsGalleryOutlineColor};
-  background: ${colorGrayUserListToolbar};
+  border: 1px solid ${({ theme }: { theme: DefaultTheme }) => theme.appsGalleryOutlineColor};
+  background: ${({ theme }: { theme: DefaultTheme }) => theme.colorGrayUserListToolbar};
 `;
 
 export default {

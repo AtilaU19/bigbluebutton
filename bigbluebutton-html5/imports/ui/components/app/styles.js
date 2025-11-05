@@ -18,7 +18,11 @@ const CaptionsWrapper = styled.div`
   user-select:none;
 `;
 
-const Layout = styled(FlexColumn)``;
+const Layout = styled(FlexColumn)`
+  width: 100%;
+  height: 100%;
+  background-color: ${({ theme }) => theme.colorBackgroundLayout};
+`;
 
 const DtfInvert = `
   :root {
@@ -99,7 +103,7 @@ const DtfInvert = `
   div[id^="scroll-box"],
   div[id^="chat-list"],
   div[id^="breakoutBox"] {
-    background-image: 
+    background-image:
       linear-gradient(rgb(45 47 56 / 0%) 30%, rgba(34, 36, 37, 0)),
       linear-gradient(rgba(34, 36, 37, 0), rgb(45 47 56 / 0%) 70%),
       radial-gradient(farthest-side at 50% 0px, rgba(13, 13, 13, 0.2), rgba(13, 13, 13, 0)),

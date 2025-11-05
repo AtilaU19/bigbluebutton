@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import Styled from '/imports/ui/components/settings/submenus/styles';
-import { colorLink } from '/imports/ui/stylesheets/styled-components/palette';
 
 const Title = styled(Styled.Title)``;
 
@@ -17,7 +16,7 @@ const FormElementRight = styled(Styled.FormElementRight)``;
 const Label = styled(Styled.Label)``;
 
 const LabelSmall = styled(Label)`
-  color: ${colorLink};
+  color: ${({ theme }) => theme.colorLink};
   font-size: 0.7rem;
   margin-bottom: 0.3rem;
 `;

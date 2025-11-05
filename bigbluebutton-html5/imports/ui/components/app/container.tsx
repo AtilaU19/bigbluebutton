@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useMutation, useReactiveVar } from '@apollo/client';
 import {
   useIsPresentationEnabled,
@@ -18,6 +18,7 @@ import {
   layoutSelectOutput,
   layoutDispatch,
 } from '/imports/ui/components/layout/context';
+import logger from '/imports/startup/client/logger';
 import {
   DispatcherFunction, Input, Layout, Output,
 } from '/imports/ui/components/layout/layoutTypes';
@@ -29,6 +30,12 @@ import {
   CurrentPresentationPageSubscriptionResponse,
 } from '/imports/ui/components/whiteboard/queries';
 import { SET_PRESENTATION_FIT_TO_WIDTH } from '/imports/ui/components/app/app-graphql/mutations';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
+import { themes, generateMuiTheme } from '/imports/ui/stylesheets/styled-components/themes';
+import {
+  ThemeProvider as MuiThemeProvider,
+} from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import App from '/imports/ui/components/app/component';
 import AudioCaptionsLiveContainer from '/imports/ui/components/audio/audio-graphql/audio-captions/live/component';
 import { PluginConfigFromGraphql } from '/imports/ui/components/plugins-engine/types';
@@ -61,9 +68,10 @@ const AppContainer: React.FC<AppContainerProps> = ({ pluginConfig }) => {
 
   const { viewScreenshare } = useSettings(SETTINGS.DATA_SAVING) as { viewScreenshare: boolean };
   const { partialUtterances, minUtteranceLength } = useSettings(SETTINGS.TRANSCRIPTION) as {
-    partialUtterances: boolean; minUtteranceLength: number };
+    partialUtterances: boolean; minUtteranceLength: number
+  };
   const {
-    darkTheme,
+    darkTheme: settingsDarkTheme,
     hideActionsBar: settingsHideActionsBar,
     hideControls,
     hideNotifications,
@@ -146,40 +154,62 @@ const AppContainer: React.FC<AppContainerProps> = ({ pluginConfig }) => {
     });
   };
 
+  const scTheme = settingsDarkTheme ? themes.dark : themes.light;
+
+  const muiTheme = useMemo(
+    () => generateMuiTheme(settingsDarkTheme),
+    [settingsDarkTheme],
+  );
+
   useEffect(() => {
     setSpeechOptions(partialUtterances, minUtteranceLength);
   }, [partialUtterances, minUtteranceLength]);
 
+  useEffect(() => {
+    if (settingsDarkTheme) {
+      logger.info({ logCode: 'dark_mode' }, 'Dark mode is on.');
+      window.dispatchEvent(new CustomEvent('darkmodechange', { detail: { enabled: true } }));
+    } else {
+      logger.info({ logCode: 'dark_mode' }, 'Dark mode is off.');
+      window.dispatchEvent(new CustomEvent('darkmodechange', { detail: { enabled: false } }));
+    }
+  }, [settingsDarkTheme]);
+
   if (!currentUser?.userId) return null;
 
   return (
-    <App
-      fitToWidth={fitToWidth}
-      handlePresentationFitToWidth={handlePresentationFitToWidth}
-      hideActionsBar={hideActionsBar}
-      isNonMediaLayout={isNonMediaLayout}
-      currentUserAway={away}
-      currentUserRaiseHand={raiseHand}
-      captionsStyle={captionsStyle}
-      presentationIsOpen={presentationIsOpen}
-      shouldShowExternalVideo={shouldShowExternalVideo}
-      shouldShowScreenshare={shouldShowScreenshare}
-      isSharedNotesPinned={isSharedNotesPinned}
-      shouldShowPresentation={shouldShowPresentation}
-      isNotificationEnabled={isNotificationEnabled}
-      isRaiseHandEnabled={isRaiseHandEnabled}
-      layoutContextDispatch={layoutContextDispatch}
-      isPollingEnabled={isPollingEnabled}
-      genericMainContentId={genericMainContent.genericContentId}
-      audioCaptions={<AudioCaptionsLiveContainer />}
-      hideNotificationToasts={hideNotificationToasts}
-      darkTheme={darkTheme}
-      selectedLayout={selectedLayout}
-      isBreakout={isBreakout}
-      meetingName={name}
-      meetingId={meetingId}
-      pluginConfig={pluginConfig}
-    />
+    <MuiThemeProvider theme={muiTheme}>
+      <CssBaseline />
+      <StyledThemeProvider theme={scTheme}>
+        <App
+          fitToWidth={fitToWidth}
+          handlePresentationFitToWidth={handlePresentationFitToWidth}
+          hideActionsBar={hideActionsBar}
+          isNonMediaLayout={isNonMediaLayout}
+          currentUserAway={away}
+          currentUserRaiseHand={raiseHand}
+          captionsStyle={captionsStyle}
+          presentationIsOpen={presentationIsOpen}
+          shouldShowExternalVideo={shouldShowExternalVideo}
+          shouldShowScreenshare={shouldShowScreenshare}
+          isSharedNotesPinned={isSharedNotesPinned}
+          shouldShowPresentation={shouldShowPresentation}
+          isNotificationEnabled={isNotificationEnabled}
+          isRaiseHandEnabled={isRaiseHandEnabled}
+          layoutContextDispatch={layoutContextDispatch}
+          isPollingEnabled={isPollingEnabled}
+          genericMainContentId={genericMainContent.genericContentId}
+          audioCaptions={<AudioCaptionsLiveContainer />}
+          hideNotificationToasts={hideNotificationToasts}
+          darkTheme={settingsDarkTheme}
+          selectedLayout={selectedLayout}
+          isBreakout={isBreakout}
+          meetingName={name}
+          meetingId={meetingId}
+          pluginConfig={pluginConfig}
+        />
+      </StyledThemeProvider>
+    </MuiThemeProvider>
   );
 };
 

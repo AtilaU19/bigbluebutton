@@ -4,10 +4,6 @@ import {
   borderSize,
   mdPaddingX,
 } from '/imports/ui/stylesheets/styled-components/general';
-import {
-  colorWhite,
-  colorText,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import ModalHeader from '/imports/ui/components/common/modal/header/component';
 
 const SimpleModal = styled(Styled.BaseModal)`
@@ -20,14 +16,14 @@ const SimpleModal = styled(Styled.BaseModal)`
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
   width: ${({ width }) => width};
   height: ${({ height }) => height};
-  background-color: ${colorWhite} !important;
+  background-color: ${({ theme }) => theme.colorBackgroundComponent} !important;
 `;
 
 const Header = styled(ModalHeader)``;
 
 const Content = styled.div`
   overflow: visible;
-  color: ${colorText};
+  color: ${({ theme }) => theme.colorText};
   font-weight: normal;
   padding: 0;
 `;

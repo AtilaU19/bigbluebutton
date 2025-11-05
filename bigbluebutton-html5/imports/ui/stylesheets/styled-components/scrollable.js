@@ -3,11 +3,13 @@ import ReactModal from 'react-modal';
 
 const ScrollboxVertical = styled.div`
   overflow-y: auto;
-  background: linear-gradient(white 30%, rgba(255,255,255,0)),
-    linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,
+  background: ${({ theme }) => `
+    linear-gradient(${theme.colorWhite} 30%, rgba(${theme.colorWhite}, 0)),
+    linear-gradient(rgba(${theme.colorWhite}, 0), ${theme.colorWhite} 70%) 0 100%,
     /* Shadows */
-    radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)),
-    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+    radial-gradient(farthest-side at 50% 0, rgba(${theme.colorBlack}, .2), rgba(${theme.colorBlack}, 0)),
+    radial-gradient(farthest-side at 50% 100%, rgba(${theme.colorBlack}, .2), rgba(${theme.colorBlack}, 0)) 0 100%
+  `};
 
   background-repeat: no-repeat;
   background-color: transparent;
@@ -24,29 +26,31 @@ const ScrollboxVertical = styled.div`
     height: 0;
   }
   &::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,.25);
+    background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`};
     border: none;
     border-radius: 50px;
   }
-  &::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.5); }
-  &::-webkit-scrollbar-thumb:active { background: rgba(0,0,0,.25); }
+  &::-webkit-scrollbar-thumb:hover { background: ${({ theme }) => `rgba(${theme.colorBlack}, .5)`}; }
+  &::-webkit-scrollbar-thumb:active { background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`}; }
   &::-webkit-scrollbar-track {
-    background: rgba(0,0,0,.25);
+    background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`};
     border: none;
     border-radius: 50px;
   }
-  &::-webkit-scrollbar-track:hover { background: rgba(0,0,0,.25); }
-  &::-webkit-scrollbar-track:active { background: rgba(0,0,0,.25); }
+  &::-webkit-scrollbar-track:hover { background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`}; }
+  &::-webkit-scrollbar-track:active { background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`}; }
   &::-webkit-scrollbar-corner { background: 0 0; }
 `;
 
 const ModalScrollboxVertical = styled(ReactModal)`
   overflow-y: auto;
-  background: linear-gradient(white 30%, rgba(255,255,255,0)),
-    linear-gradient(rgba(255,255,255,0), white 70%) 0 100%,
+  background: ${({ theme }) => `
+    linear-gradient(${theme.colorWhite} 30%, rgba(${theme.colorWhite}, 0)),
+    linear-gradient(rgba(${theme.colorWhite}, 0), ${theme.colorWhite} 70%) 0 100%,
     /* Shadows */
-    radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)),
-    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+    radial-gradient(farthest-side at 50% 0, rgba(${theme.colorBlack}, .2), rgba(${theme.colorBlack}, 0)),
+    radial-gradient(farthest-side at 50% 100%, rgba(${theme.colorBlack}, .2), rgba(${theme.colorBlack}, 0)) 0 100%
+  `};
 
   background-repeat: no-repeat;
   background-color: transparent;
@@ -63,19 +67,19 @@ const ModalScrollboxVertical = styled(ReactModal)`
     height: 0;
   }
   &::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,.25);
+    background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`};
     border: none;
     border-radius: 50px;
   }
-  &::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,.5); }
-  &::-webkit-scrollbar-thumb:active { background: rgba(0,0,0,.25); }
+  &::-webkit-scrollbar-thumb:hover { background: ${({ theme }) => `rgba(${theme.colorBlack}, .5)`}; }
+  &::-webkit-scrollbar-thumb:active { background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`}; }
   &::-webkit-scrollbar-track {
-    background: rgba(0,0,0,.25);
+    background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`};
     border: none;
     border-radius: 50px;
   }
-  &::-webkit-scrollbar-track:hover { background: rgba(0,0,0,.25); }
-  &::-webkit-scrollbar-track:active { background: rgba(0,0,0,.25); }
+  &::-webkit-scrollbar-track:hover { background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`}; }
+  &::-webkit-scrollbar-track:active { background: ${({ theme }) => `rgba(${theme.colorBlack}, .25)`}; }
   &::-webkit-scrollbar-corner { background: 0 0; }
 `;
 

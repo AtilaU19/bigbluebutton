@@ -1,10 +1,5 @@
 import styled from 'styled-components';
 import { barsPadding } from '/imports/ui/stylesheets/styled-components/general';
-import {
-  colorWhite,
-  colorBackground,
-  colorGray,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import { fontSizeBase } from '/imports/ui/stylesheets/styled-components/typography';
 import { phoneLandscape, smallOnly } from '/imports/ui/stylesheets/styled-components/breakpoints';
 
@@ -14,7 +9,7 @@ const Navbar = styled.header`
   flex-direction: column;
   text-align: center;
   font-size: 1.5rem;
-  background-color: ${colorBackground};
+  background-color: ${({ theme }) => theme.colorBackgroundLayout};
   padding: ${barsPadding} ${barsPadding} 0 ${barsPadding};
 `;
 
@@ -42,7 +37,7 @@ const Center = styled.div`
 
 const PresentationTitle = styled.h1`
   font-weight: 400;
-  color: ${colorWhite};
+  color: ${({ theme }) => theme.colorWhite};
   font-size: ${fontSizeBase};
   margin: 0;
   padding: 0;
@@ -67,7 +62,7 @@ const PresentationTitle = styled.h1`
 
 const PluginInfoComponent = styled.h1`
   font-weight: 400;
-  color: ${colorWhite};
+  color: ${({ theme }) => theme.colorWhite};
   font-size: ${fontSizeBase};
   margin: 0;
   padding: 0;
@@ -82,7 +77,7 @@ const PluginComponentWrapper = styled.div`
 `;
 
 const PluginSeparatorWrapper = styled.div`
-  color: ${colorGray};
+  color: ${({ theme }) => theme.colorGray};
   font-size: ${fontSizeBase};
   margin: 0 1rem;
 `;

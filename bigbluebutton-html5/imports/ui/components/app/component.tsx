@@ -32,7 +32,6 @@ import GlobalStyles from '/imports/ui/stylesheets/styled-components/globalStyles
 import ActionsBarContainer from '../actions-bar/container';
 import PushLayoutEngine from '../layout/push-layout/pushLayoutEngine';
 import NotesContainer from '/imports/ui/components/notes/component';
-import AppService from '/imports/ui/components/app/service';
 import PresentationUploaderToastContainer from '/imports/ui/components/presentation/presentation-toast/presentation-uploader-toast/container';
 import BreakoutJoinConfirmationContainerGraphQL from '../breakout-join-confirmation/breakout-join-confirmation-graphql/component';
 import FloatingWindowContainer from '/imports/ui/components/floating-window/container';
@@ -126,10 +125,6 @@ const App: React.FC<AppProps> = ({
   useUserStatusNotifications(currentUserAway, currentUserRaiseHand, intl);
 
   useEffect(() => {
-    AppService.setDarkTheme(darkTheme);
-  }, [darkTheme]);
-
-  useEffect(() => {
     setPresentationFitToWidth(fitToWidth);
   }, [fitToWidth]);
 
@@ -185,10 +180,6 @@ const App: React.FC<AppProps> = ({
         <GlobalStyles />
         <Styled.Layout
           id="layout"
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
         >
           <ActivityCheckContainer />
           <RequestUnmuteContainer />

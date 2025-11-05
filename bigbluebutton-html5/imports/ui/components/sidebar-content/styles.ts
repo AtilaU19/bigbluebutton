@@ -1,12 +1,5 @@
 import styled from 'styled-components';
 import {
-  colorWhite,
-  colorPrimary,
-  colorBorder,
-  appsPanelTextColor,
-  colorBackground,
-} from '/imports/ui/stylesheets/styled-components/palette';
-import {
   borderSize,
   navbarHeight,
   smPaddingX,
@@ -22,7 +15,7 @@ import { textFontWeight } from '../../stylesheets/styled-components/typography';
 
 const SidebarContentBackdrop = styled.div<{isRTL: boolean, isMobile: boolean}>`
   position: absolute;
-  background-color: ${colorBackground};
+  background-color: ${({ theme }) => theme.colorBackgroundLayout};
   ${({ isMobile, isRTL }) => !isMobile && `
     padding: ${isRTL
     ? `
@@ -44,7 +37,7 @@ const Poll = styled.div`
   outline-style: solid;
   order: 2;
   height: 100%;
-  background-color: ${colorWhite};
+  background-color: ${({ theme }) => theme.colorWhite};
   min-width: 20em;
   padding: ${smPaddingX};
 
@@ -69,7 +62,7 @@ const Poll = styled.div`
 `;
 
 export const SidebarContentPanel = styled.div<SidebarContentPanelProps>`
-  background-color: ${colorWhite};
+  background-color: ${({ theme }) => theme.colorBackgroundComponent};
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -79,11 +72,11 @@ export const SidebarContentPanel = styled.div<SidebarContentPanelProps>`
   user-select: none;
 
   a {
-    color: ${colorPrimary};
+    color: ${({ theme }) => theme.colorPrimary};
     text-decoration: none;
 
     &:focus {
-      color: ${colorPrimary};
+      color: ${({ theme }) => theme.colorPrimary};
       text-decoration: underline;
     }
     &:hover {
@@ -124,12 +117,12 @@ export const HeaderContainer = styled(Header)`
 export const Separator = styled.hr`
   width: 100%;
   border: 0;
-  border-bottom: 1px solid ${colorBorder};
+  border-bottom: 1px solid ${({ theme }) => theme.colorSeparator};
 `;
 
 export const PanelContent = styled.div`
   height: 100%;
-  color: ${appsPanelTextColor};
+  color: ${({ theme }) => theme.appsPanelTextColor};
   font-weight: ${textFontWeight};
   line-height: normal;
 `;

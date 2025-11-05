@@ -1,8 +1,5 @@
-import * as DarkReader from 'darkreader';
 import data from '@emoji-mart/data';
 import { init } from 'emoji-mart';
-import Styled from './styles';
-import logger from '/imports/startup/client/logger';
 import useMeeting from '../../core/hooks/useMeeting';
 import Storage from '/imports/ui/services/storage/session';
 
@@ -22,36 +19,7 @@ export function useMeetingIsBreakout() {
   return meeting && meeting.isBreakout;
 }
 
-export const setDarkTheme = (value) => {
-  let invert = [Styled.DtfInvert];
-
-  if (equalURLs()) {
-    invert = [Styled.DtfBrandingInvert];
-  }
-
-  if (value && !DarkReader.isEnabled()) {
-    DarkReader.enable(
-      { brightness: 100, contrast: 90, sepia: 0 },
-      {
-        invert,
-        ignoreInlineStyle: [Styled.DtfCss, Styled.DtfAvatars],
-        ignoreImageAnalysis: [Styled.DtfImages],
-      },
-    );
-    logger.info({ logCode: 'dark_mode' }, 'Dark mode is on.');
-
-    window.dispatchEvent(new CustomEvent('darkmodechange', { detail: { enabled: true } }));
-  }
-
-  if (!value && DarkReader.isEnabled()) {
-    DarkReader.disable();
-    logger.info({ logCode: 'dark_mode' }, 'Dark mode is off.');
-
-    window.dispatchEvent(new CustomEvent('darkmodechange', { detail: { enabled: false } }));
-  }
-};
-
-export const isDarkThemeEnabled = () => DarkReader.isEnabled();
+export const isDarkThemeEnabled = () => window.meetingClientSettings.public.app.darkTheme.enabled;
 
 export const initializeEmojiData = () => {
   const DISABLE_EMOJIS = window.meetingClientSettings.public.chat.disableEmojis;
@@ -75,7 +43,6 @@ export const initializeEmojiData = () => {
 };
 
 export default {
-  setDarkTheme,
   isDarkThemeEnabled,
   useMeetingIsBreakout,
   initializeEmojiData,

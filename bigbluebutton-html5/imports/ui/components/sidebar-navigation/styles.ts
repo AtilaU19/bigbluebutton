@@ -9,17 +9,6 @@ import {
   navigationSidebarPaddingY,
   navigationSidebarMargin,
 } from '/imports/ui/stylesheets/styled-components/general';
-import {
-  colorGrayDark,
-  colorGrayLight,
-  colorWhite,
-  colorDanger,
-  colorPrimary,
-  listItemBgHover,
-  itemFocusBorder,
-  colorGrayIcons,
-  colorBackground,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import { ScrollboxVertical } from '/imports/ui/stylesheets/styled-components/scrollable';
 import Button from '/imports/ui/components/common/button/component';
 
@@ -28,8 +17,8 @@ const smallHeight = '(max-height: 40em)';
 const NavigationSidebarBackdrop = styled.div<{animations: boolean, isMobile: boolean, isExpanded: boolean}>`
   position: absolute;
 
-  ${({ isMobile }) => !isMobile && `
-    background-color: ${colorBackground};
+  ${({ isMobile, theme }) => !isMobile && `
+    background-color: ${theme.colorBackgroundLayout};
     padding: ${navigationSidebarMargin};
   `}
   ${({ isMobile, animations }) => isMobile && `
@@ -39,7 +28,7 @@ const NavigationSidebarBackdrop = styled.div<{animations: boolean, isMobile: boo
 `;
 
 const NavigationSidebar = styled.div<{animations: boolean, isMobile: boolean, isExpanded: boolean}>`
-  background-color: ${colorWhite};
+  background-color: ${({ theme }) => theme.colorBackgroundComponent};
   border-radius: ${navigationSidebarBorderRadius};
   display: flex;
   flex-direction: column;
@@ -61,7 +50,7 @@ const NavigationToggleButton = styled(Button)`
   margin: 0;
   z-index: 3;
   align-self: center;
-  ${({ hasNotification }) => hasNotification && `
+  ${({ hasNotification, theme }) => hasNotification && `
     position: relative;
 
     &:after {
@@ -72,8 +61,8 @@ const NavigationToggleButton = styled(Button)`
       height: 12px;
       bottom: ${borderSize};
       right: 3px;
-      background-color: ${colorDanger};
-      border: ${borderSize} solid ${colorGrayDark};
+      background-color: ${theme.colorDanger};
+      border: ${borderSize} solid ${theme.colorGrayDark};
     }
   `}
 `;
@@ -150,7 +139,7 @@ const ListItem = styled.div<ListItemProps>`
   justify-content: center;
   align-self: center;
   text-decoration: none;
-  color: ${colorGrayIcons};
+  color: ${({ theme }) => theme.colorGrayIcons};
   cursor: pointer;
   width: ${navigationSidebarListItemsWidth};
   aspect-ratio: 1 / 1;
@@ -158,7 +147,7 @@ const ListItem = styled.div<ListItemProps>`
 
   > i {
     font-size: 175%;
-    color: ${colorGrayLight};
+    color: ${({ theme }) => theme.colorIcon};
 
     @media ${smallHeight} {
       font-size: 125%;
@@ -169,7 +158,7 @@ const ListItem = styled.div<ListItemProps>`
     outline: transparent;
     outline-style: dotted;
     outline-width: ${borderSize};
-    background-color: ${listItemBgHover};
+    background-color: ${({ theme }) => theme.listItemBgHover};
   }
 
   &:active,
@@ -177,22 +166,23 @@ const ListItem = styled.div<ListItemProps>`
     outline: transparent;
     outline-width: ${borderSize};
     outline-style: solid;
-    background-color: ${listItemBgHover};
-    box-shadow: inset 0 0 0 ${borderSize} ${itemFocusBorder}, inset 1px 0 0 1px ${itemFocusBorder};
+    background-color: ${({ theme }) => theme.listItemBgHover};
+    box-shadow: inset 0 0 0 ${borderSize} ${({ theme }) => theme.itemFocusBorder},
+      inset 1px 0 0 1px ${({ theme }) => theme.itemFocusBorder};
   }
-  
-  ${({ active }: ListItemProps) => active && `
+
+  ${({ active, theme }) => active && `
     outline: transparent;
     outline-style: dotted;
     outline-width: ${borderSize};
-    color: ${colorWhite};
-    background-color: ${colorPrimary} !important;
+    color: ${theme.colorWhite};
+    background-color: ${theme.colorPrimary} !important;
     > i {
-      color: ${colorWhite} !important;
+      color: ${theme.colorNavigationIcons} !important;
     }
   `}
 
-  ${({ hasNotification }: ListItemProps) => hasNotification && `
+  ${({ hasNotification, theme }) => hasNotification && `
     &:after {
       content: '';
       position: absolute;
@@ -201,8 +191,8 @@ const ListItem = styled.div<ListItemProps>`
       height: 12px;
       bottom: ${borderSize};
       right: 3px;
-      background-color: ${colorDanger};
-      border: ${borderSize} solid ${colorGrayDark};
+      background-color: ${theme.colorDanger};
+      border: ${borderSize} solid ${theme.colorGrayDark};
     }
   `}
 
@@ -218,8 +208,8 @@ const BadgeCircle = styled.div`
   height: 12px;
   bottom: ${borderSize};
   right: 3px;
-  background-color: ${colorDanger};
-  border: ${borderSize} solid ${colorGrayDark};
+  background-color: ${({ theme }) => theme.colorDanger};
+  border: ${borderSize} solid ${({ theme }) => theme.colorGrayDark};
   display: flex;
   justify-content: center;
   align-items: center;

@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 import {
   colorPrimary,
-  colorWhite,
   colorGrayLighter,
   colorGrayLightest,
-  colorText,
 } from '/imports/ui/stylesheets/styled-components/palette';
 import {
   xsPadding,
@@ -27,7 +25,7 @@ type PanelProps = {
 };
 
 const Panel = styled.div<PanelProps>`
-  background-color: ${colorWhite};
+  background-color: ${({ theme }) => theme.colorBackgroundComponent};
   display: flex;
   flex-grow: 1;
   flex-direction: column;
@@ -60,7 +58,7 @@ const SwitchTitle = styled(FormControlLabel)`
   //width: 1.5rem;
   //flex-shrink: 0;
   .MuiFormControlLabel-label {
-    color: ${colorText};
+    color: ${({ theme }) => theme.colorText};
     font-size: ${fontSizeBase}
     font-weight: ${textFontWeight};
     line-height: normal;
@@ -167,7 +165,7 @@ const Input = styled(TextareaAutosize)`
   }
 
   &:focus {
-    color: ${colorText};
+    color: ${({ theme }) => theme.colorText};
   }
 
   &:disabled,
@@ -191,14 +189,14 @@ const InputWrapper = styled.div`
 
 const NoMessageText = styled.div`
   padding-left: 2.5rem;
-  color: ${colorText};
+  color: ${({ theme }) => theme.colorText};
   font-size: ${fontSizeSmall};
 `;
 
 const GuestLobbyMessage = styled.div`
-  color: ${colorText};
+  color: ${({ theme }) => theme.colorText};
   font-size: ${fontSizeSmall};
-  font-style: italic;  
+  font-style: italic;
 `;
 
 export default {

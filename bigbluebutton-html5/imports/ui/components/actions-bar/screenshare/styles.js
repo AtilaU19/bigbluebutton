@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import ModalSimple from '/imports/ui/components/common/modal/simple/component';
-import { colorGrayDark } from '/imports/ui/stylesheets/styled-components/palette';
 import {
   jumboPaddingY,
   minModalHeight,
@@ -20,7 +19,7 @@ const ScreenShareModal = styled(ModalSimple)`
 const Title = styled.h3`
   font-weight: ${headingsFontWeight};
   font-size: ${fontSizeLarge};
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   white-space: normal;
   padding-bottom: ${mdPaddingX};
 `;

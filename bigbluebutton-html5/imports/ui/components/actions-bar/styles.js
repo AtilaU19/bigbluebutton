@@ -1,13 +1,6 @@
 import styled from 'styled-components';
 import { smallOnly } from '/imports/ui/stylesheets/styled-components/breakpoints';
 import { smPaddingX, smPaddingY, barsPadding } from '/imports/ui/stylesheets/styled-components/general';
-import {
-  colorWhite,
-  colorBackground,
-  btnDefaultBg,
-  btnDefaultColor,
-  defaultBorder,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import Button from '/imports/ui/components/common/button/component';
 
 const ActionsBar = styled.div`
@@ -20,7 +13,7 @@ const ActionsBar = styled.div`
 const ActionsBarWrapper = styled.section`
   flex: 1;
   padding: ${barsPadding};
-  background-color: ${colorBackground};
+  background-color: ${({ theme }) => theme.colorBackgroundLayout};
   position: relative;
   order: 3;
 `;
@@ -81,8 +74,8 @@ const Right = styled.div`
 `;
 
 const PresentationButtonsWrapper = styled.div`
-  color: ${btnDefaultColor};
-  background-color: ${btnDefaultBg};
+  color: ${({ theme }) => theme.btnDefaultColor};
+  background-color: ${({ theme }) => theme.btnDefaultBg};
   border-radius: 3rem;
   display: flex;
   gap: .2rem;
@@ -91,16 +84,16 @@ const PresentationButtonsWrapper = styled.div`
 `;
 
 const Divider = styled.div`
-  border: .5px solid ${defaultBorder};
+  border: .5px solid ${({ theme }) => theme.defaultBorder};
   height: 50%;
 `;
 
 const RaiseHandButton = styled(Button)`
-  ${({ ghost }) => ghost && `
+  ${({ ghost, theme }) => ghost && `
     & > span {
       box-shadow: none;
       background-color: transparent !important;
-      border-color: ${colorWhite} !important;
+      border-color: ${theme.colorWhite} !important;
     }
   `}
 `;
@@ -132,7 +125,7 @@ const Wrapper = styled.div`
 const Separator = styled.div`
   height: 2.5rem;
   width: 0;
-  border: 1px solid ${colorWhite};
+  border: 1px solid ${({ theme }) => theme.colorSeparator};
   align-self: center;
   opacity: .75;
 `;

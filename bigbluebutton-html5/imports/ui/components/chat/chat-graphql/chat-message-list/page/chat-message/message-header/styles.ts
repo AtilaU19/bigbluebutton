@@ -1,10 +1,4 @@
 import styled from 'styled-components';
-
-import {
-  colorHeading,
-  colorGrayLight,
-  colorGrayDark,
-} from '/imports/ui/stylesheets/styled-components/palette';
 import { fontSizeSmaller, lineHeightComputed } from '/imports/ui/stylesheets/styled-components/typography';
 
 interface ChatUserNameProps {
@@ -33,8 +27,8 @@ export const ChatUserName = styled.div<ChatUserNameProps>`
   text-overflow: ellipsis;
   flex-shrink: 1;
 
-  ${({ currentlyInMeeting }) => currentlyInMeeting && `
-    color: ${colorHeading};
+  ${({ currentlyInMeeting, theme }) => currentlyInMeeting && `
+    color: ${theme.colorTextBlack};
   `}
 
   ${({ currentlyInMeeting }) => !currentlyInMeeting && `
@@ -54,7 +48,7 @@ export const ChatUserName = styled.div<ChatUserNameProps>`
 `;
 
 export const ChatUserOffline = styled.span`
-  color: ${colorGrayLight};
+  color: ${({ theme }) => theme.colorGrayLight};
   font-weight: 100;
   text-transform: lowercase;
   font-style: italic;
@@ -68,7 +62,7 @@ export const ChatTime = styled.time`
   flex-shrink: 0;
   flex-grow: 0;
   flex-basis: max-content;
-  color: ${colorGrayDark};
+  color: ${({ theme }) => theme.colorGrayDark};
   text-transform: uppercase;
   font-size: 75%;
   [dir='rtl'] & {
@@ -87,7 +81,7 @@ export const ChatHeaderText = styled.div`
 `;
 
 export const EditLabel = styled.span`
-  color: ${colorGrayLight};
+  color: ${({ theme }) => theme.colorGrayLight};
   font-size: ${fontSizeSmaller};
   display: flex;
   align-items: center;

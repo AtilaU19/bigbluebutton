@@ -14,18 +14,17 @@ const Content = styled.div`
 const Text = styled.p`
   margin: 8px 0;
   font-size: 14px;
-  color: #333;
+  color: ${({ theme }) => theme.colorText};
 `;
 
 const Link = styled.a`
-  color: #333;
+  color: ${({ theme }) => theme.colorLink};
 `;
 
 const TableButton = styled.button`
-  color: #333;
+  color: ${({ theme }) => theme.colorLink};
   background-color: transparent;
   border: none;
-  font-size: 1rem;
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
@@ -38,12 +37,12 @@ const TableButton = styled.button`
   }
 
   &:focus {
-    outline: 2px solid #007BFF;
+    outline: 2px solid ${({ theme }) => theme.colorPrimary};
     outline-offset: 2px;
   }
 
   &:active {
-    color: #0056b3;
+    color: ${({ theme }) => theme.btnPrimaryHoverBg};
   }
 `;
 
