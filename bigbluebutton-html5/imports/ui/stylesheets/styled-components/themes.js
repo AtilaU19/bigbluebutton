@@ -325,10 +325,10 @@ export const palette = {
 };
 
 /**
- * Gera um tema do Material-UI (light ou dark) com base
- * nas variáveis dos temas 'light' e 'dark' acima.
- * @param {boolean} isDark - Se o tema deve ser escuro.
- * @returns {import('@mui/material/styles').Theme} O objeto de tema do MUI.
+ * Generates a Material-UI theme (light or dark) based on
+ * the 'light' and 'dark' theme variables above.
+ * @param {boolean} isDark - Whether the theme should be dark.
+ * @returns {import('@mui/material/styles').Theme} The MUI theme object.
  */
 export const generateMuiTheme = (isDark) => {
   const scTheme = isDark ? dark : light;
