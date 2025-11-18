@@ -25,6 +25,7 @@ export interface UserListItemProps {
   open: boolean;
   setOpenUserAction: React.Dispatch<React.SetStateAction<string | null>>;
   pageId: string;
+  type: 'raised-hand' | 'participant';
 }
 
 export interface UserActionPermissions {
@@ -38,4 +39,5 @@ export interface UserActionPermissions {
   allowedToChangeUserLockStatus: boolean | undefined;
   allowedToEjectCameras: boolean | undefined;
   allowedToRemove: boolean | undefined;
+  allowedToLowerHand: boolean | undefined;
 }
