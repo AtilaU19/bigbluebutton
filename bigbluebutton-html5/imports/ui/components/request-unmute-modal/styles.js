@@ -33,6 +33,10 @@ const RequestModalContent = styled.div`
 
   & > button {
     min-width: ${confirmationButtonMinWidth};
+
+    @media ${smallOnly} {
+      min-width: 0;
+    }
   }
 
   @media ${smallOnly} {
