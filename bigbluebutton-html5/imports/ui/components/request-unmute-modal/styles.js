@@ -33,20 +33,17 @@ const RequestModalContent = styled.div`
 
   & > button {
     min-width: ${confirmationButtonMinWidth};
-
-    @media ${smallOnly} {
-      min-width: 0;
-    }
   }
 
   @media ${smallOnly} {
-    flex-direction: row-reverse;
+    flex-direction: column-reverse;
+    align-items: stretch;
     gap: 1rem;
     margin-top: 0;
     padding: 0;
 
     button {
-      flex: 1;
+      white-space: normal;
 
       i {
         display: none;
