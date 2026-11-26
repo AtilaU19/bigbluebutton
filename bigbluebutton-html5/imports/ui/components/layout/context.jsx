@@ -1,4 +1,6 @@
-import React, { useEffect, useReducer, useRef } from 'react';
+import React, {
+  useEffect, useMemo, useReducer, useRef,
+} from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import PropTypes from 'prop-types';
 import { clone } from 'ramda';
@@ -87,6 +89,54 @@ const setPersistedPinnedApps = (apps) => {
   Local.setItem(PINNED_APPS_STORAGE_KEY, apps);
 };
 
+const areResizableEdgesEqual = (a, b) => (
+  a === b
+  || (
+    Boolean(a && b)
+    && a.top === b.top
+    && a.right === b.right
+    && a.bottom === b.bottom
+    && a.left === b.left
+  )
+);
+
+const areDropAreasEqual = (a, b) => {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  for (let i = 0; i < keysA.length; i += 1) {
+    const key = keysA[i];
+    if (!Object.prototype.hasOwnProperty.call(b, key)) return false;
+    const zoneA = a[key];
+    const zoneB = b[key];
+    if (zoneA !== zoneB) {
+      if (!zoneA || !zoneB) return false;
+      const zoneKeysA = Object.keys(zoneA);
+      const zoneKeysB = Object.keys(zoneB);
+      if (zoneKeysA.length !== zoneKeysB.length) return false;
+      for (let j = 0; j < zoneKeysA.length; j += 1) {
+        const zKey = zoneKeysA[j];
+        if (!Object.prototype.hasOwnProperty.call(zoneB, zKey) || zoneA[zKey] !== zoneB[zKey]) {
+          return false;
+        }
+      }
+    }
+  }
+  return true;
+};
+
+const projectMeetingForLayout = (m) => ({
+  componentsFlags: {
+    isSharedNotesPinned: m.componentsFlags?.isSharedNotesPinned,
+  },
+  layout: {
+    setByUserId: m.layout?.setByUserId,
+    presentationMinimized: m.layout?.presentationMinimized,
+  },
+});
+
 const reducer = (state, action) => {
   debugActions(action.type, action.value);
   switch (action.type) {
@@ -130,7 +180,7 @@ const reducer = (state, action) => {
     // LAYOUT TYPE
     // using to load a different layout manager
     case ACTIONS.SET_LAYOUT_TYPE: {
-      const { layoutType } = state.input;
+      const { layoutType } = state;
       if (layoutType === action.value) return state;
       return {
         ...state,
@@ -439,6 +489,29 @@ const reducer = (state, action) => {
       const { sidebarNavigation } = state.input;
       const { registeredApps = {}, pinnedApps = [] } = sidebarNavigation;
 
+      const savedPinnedApps = getPersistedPinnedApps();
+      const maxPinned = window.meetingClientSettings?.public?.app?.appsGallery?.maxPinnedApps ?? 0;
+      const shouldRestorePin = Array.isArray(savedPinnedApps)
+        && savedPinnedApps.includes(id)
+        && !pinnedApps.includes(id)
+        && pinnedApps.length < maxPinned;
+
+      const existing = registeredApps[id];
+      if (
+        existing
+        && !shouldRestorePin
+        && existing.name === name
+        && existing.icon === icon
+        && existing.uuid === uuid
+        && existing.pluginName === pluginName
+        && existing.hasNotification === hasNotification
+        && existing.contentFunction === (contentFunction || undefined)
+        && existing.onClick === (onClick || undefined)
+        && existing.dataTest === (dataTest || undefined)
+      ) {
+        return state;
+      }
+
       const newRegisteredApps = {
         ...registeredApps,
         [id]: {
@@ -456,21 +529,7 @@ const reducer = (state, action) => {
       const sortedRegisteredApps = Object.fromEntries(Object.entries(newRegisteredApps)
         .sort(([, a], [, b]) => a.name.localeCompare(b.name)));
 
-      const orderedPinnedApps = pinnedApps.slice();
-
-      let restoredPinnedApps = orderedPinnedApps;
-      const savedPinnedApps = getPersistedPinnedApps();
-
-      if (
-        Array.isArray(savedPinnedApps)
-        && savedPinnedApps.includes(id)
-        && !orderedPinnedApps.includes(id)
-      ) {
-        const MAX_PINNED = window.meetingClientSettings.public.app.appsGallery.maxPinnedApps;
-        if (orderedPinnedApps.length < MAX_PINNED) {
-          restoredPinnedApps = [...orderedPinnedApps, id];
-        }
-      }
+      const restoredPinnedApps = shouldRestorePin ? [...pinnedApps, id] : pinnedApps;
 
       return {
         ...state,
@@ -596,14 +655,20 @@ const reducer = (state, action) => {
     case ACTIONS.SET_SIDEBAR_NAVIGATION_NOTIFICATION_APP: {
       const { id: appId, hasNotification } = action.value;
       const { sidebarNavigation } = state.input;
-      const { registeredApps = [] } = sidebarNavigation;
+      const { registeredApps = {} } = sidebarNavigation;
 
       const isAppRegistered = appId in registeredApps;
 
       if (!isAppRegistered) return state;
       if (registeredApps[appId].hasNotification === hasNotification) return state;
 
-      registeredApps[appId].hasNotification = hasNotification;
+      const nextRegisteredApps = {
+        ...registeredApps,
+        [appId]: {
+          ...registeredApps[appId],
+          hasNotification,
+        },
+      };
 
       return {
         ...state,
@@ -611,7 +676,7 @@ const reducer = (state, action) => {
           ...state.input,
           sidebarNavigation: {
             ...sidebarNavigation,
-            registeredApps,
+            registeredApps: nextRegisteredApps,
           },
         },
       };
@@ -631,6 +696,7 @@ const reducer = (state, action) => {
       if (sidebarNavigation.display === display
         && sidebarNavigation.width === width
         && sidebarNavigation.height === height
+        && sidebarNavigation.top === top
         && sidebarNavigation.left === left
         && sidebarNavigation.right === right
         && sidebarNavigation.tabOrder === tabOrder
@@ -671,30 +737,34 @@ const reducer = (state, action) => {
         return state;
       }
 
-      if (action.value === true) {
-        // Ensure the sidebar content is open as well
-        sidebarContent.isOpen = true;
-        // Reset camera position if it is under the sidebar content
-        if (cameraDock.position === CAMERADOCK_POSITION.SIDEBAR_CONTENT_BOTTOM) {
-          cameraDock.position = CAMERADOCK_POSITION.CONTENT_TOP;
-        }
-        // Reset auxiliary sidebar content panel to none to avoid showing
-        // the same content in both sidebars
-        if (sidebarContent.sidebarContentPanel === sidebarContentAuxiliary.sidebarContentPanel) {
-          sidebarContentAuxiliary.sidebarContentPanel = PANELS.NONE;
-        }
-      }
+      // Ensure the sidebar content is open as well
+      const nextSidebarContent = (action.value === true && !sidebarContent.isOpen)
+        ? { ...sidebarContent, isOpen: true }
+        : sidebarContent;
+      // Reset camera position if it is under the sidebar content
+      const nextCameraDock = (
+        action.value === true
+        && cameraDock.position === CAMERADOCK_POSITION.SIDEBAR_CONTENT_BOTTOM
+      )
+        ? { ...cameraDock, position: CAMERADOCK_POSITION.CONTENT_TOP }
+        : cameraDock;
+      // Reset auxiliary sidebar content panel to none to avoid showing
+      // the same content in both sidebars
+      const shouldResetAuxPanel = action.value === true
+        && sidebarContent.sidebarContentPanel === sidebarContentAuxiliary.sidebarContentPanel;
+
       return {
         ...state,
         // Reset chat to public if there is no chat open.
         idChatOpen: state.idChatOpen || PUBLIC_GROUP_CHAT_ID,
         input: {
           ...state.input,
-          cameraDock,
+          cameraDock: nextCameraDock,
           sidebarNavigation,
-          sidebarContent,
+          sidebarContent: nextSidebarContent,
           sidebarContentAuxiliary: {
             ...sidebarContentAuxiliary,
+            ...(shouldResetAuxPanel ? { sidebarContentPanel: PANELS.NONE } : {}),
             isOpen: action.value,
           },
         },
@@ -775,6 +845,7 @@ const reducer = (state, action) => {
         && sidebarContentAuxiliary.top === top
         && sidebarContentAuxiliary.left === left
         && sidebarContentAuxiliary.right === right
+        && sidebarContentAuxiliary.currentPanelType === currentPanelType
         && sidebarContentAuxiliary.tabOrder === tabOrder
         && sidebarContentAuxiliary.zIndex === zIndex
         && sidebarContentAuxiliary.isResizable === isResizable) {
@@ -845,16 +916,16 @@ const reducer = (state, action) => {
       }
 
       // Enforce auxiliary sidebar close when the default one is closed
-      if (action.value === false) {
-        sidebarContentAuxiliary.isOpen = false;
-      }
+      const nextSidebarContentAuxiliary = (action.value === false && sidebarContentAuxiliary.isOpen)
+        ? { ...sidebarContentAuxiliary, isOpen: false }
+        : sidebarContentAuxiliary;
 
       return {
         ...state,
         input: {
           ...state.input,
           sidebarNavigation,
-          sidebarContentAuxiliary,
+          sidebarContentAuxiliary: nextSidebarContentAuxiliary,
           sidebarContent: {
             ...sidebarContent,
             isOpen: action.value,
@@ -948,6 +1019,7 @@ const reducer = (state, action) => {
         && sidebarContent.top === top
         && sidebarContent.left === left
         && sidebarContent.right === right
+        && sidebarContent.currentPanelType === currentPanelType
         && sidebarContent.tabOrder === tabOrder
         && sidebarContent.zIndex === zIndex
         && sidebarContent.isResizable === isResizable) {
@@ -1168,9 +1240,11 @@ const reducer = (state, action) => {
       const { cameraDock } = state.output;
       if (cameraDock.display === display
         && cameraDock.position === position
+        && cameraDock.minWidth === minWidth
         && cameraDock.width === width
         && cameraDock.maxWidth === maxWidth
         && cameraDock.presenterMaxWidth === presenterMaxWidth
+        && cameraDock.minHeight === minHeight
         && cameraDock.height === height
         && cameraDock.maxHeight === maxHeight
         && cameraDock.top === top
@@ -1179,7 +1253,7 @@ const reducer = (state, action) => {
         && cameraDock.tabOrder === tabOrder
         && cameraDock.isDraggable === isDraggable
         && cameraDock.zIndex === zIndex
-        && cameraDock.resizableEdge === resizableEdge
+        && areResizableEdgesEqual(cameraDock.resizableEdge, resizableEdge)
         && cameraDock.focusedId === focusedId
         && cameraDock.isLocalOnly === isLocalOnly) {
         return state;
@@ -1232,7 +1306,7 @@ const reducer = (state, action) => {
     // WEBCAMS DROP AREAS
     case ACTIONS.SET_DROP_AREAS: {
       const { dropZoneAreas } = state.output;
-      if (dropZoneAreas === action.value) {
+      if (areDropAreasEqual(dropZoneAreas, action.value)) {
         return state;
       }
       return {
@@ -1264,8 +1338,19 @@ const reducer = (state, action) => {
         return state;
       }
       const { presentationAreaContentActions } = state;
-      presentationAreaContentActions[presentationAreaContentActions.length - 1]
-        .value.open = action.value;
+      const lastIndex = presentationAreaContentActions.length - 1;
+      const nextPresentationAreaContentActions = lastIndex >= 0
+        ? [
+          ...presentationAreaContentActions.slice(0, lastIndex),
+          {
+            ...presentationAreaContentActions[lastIndex],
+            value: {
+              ...presentationAreaContentActions[lastIndex].value,
+              open: action.value,
+            },
+          },
+        ]
+        : presentationAreaContentActions;
       return {
         ...state,
         input: {
@@ -1275,7 +1360,7 @@ const reducer = (state, action) => {
             isOpen: action.value,
           },
         },
-        presentationAreaContentActions,
+        presentationAreaContentActions: nextPresentationAreaContentActions,
       };
     }
     case ACTIONS.SET_PRESENTATION_SLIDES_LENGTH: {
@@ -1730,21 +1815,22 @@ const reducer = (state, action) => {
     case ACTIONS.SET_PILE_CONTENT_FOR_PRESENTATION_AREA: {
       const { presentationAreaContentActions } = state;
       if (action.value.open) {
+        const nextPresentationAreaContentActions = presentationAreaContentActions.slice();
         const { replacesGenericContentId, ...value } = action.value;
         const replacedIndex = replacesGenericContentId
-          ? presentationAreaContentActions.findIndex((p) => (
+          ? nextPresentationAreaContentActions.findIndex((p) => (
             p.value.content === PRESENTATION_AREA.GENERIC_CONTENT
             && p.value.genericContentId === replacesGenericContentId
           ))
           : -1;
         if (replacedIndex !== -1) {
-          presentationAreaContentActions.splice(replacedIndex, 1, { ...action, value });
+          nextPresentationAreaContentActions.splice(replacedIndex, 1, { ...action, value });
           // The pile keeps its shape, so nothing re-derives the area: point it at the new item
           const { genericMainContent } = state.input;
           if (genericMainContent.genericContentId === replacesGenericContentId) {
             return {
               ...state,
-              presentationAreaContentActions,
+              presentationAreaContentActions: nextPresentationAreaContentActions,
               input: {
                 ...state.input,
                 genericMainContent: {
@@ -1759,45 +1845,51 @@ const reducer = (state, action) => {
           // pinned notes) and shows once that content stops. For a new share, the presenter's
           // client stops it. Content restored after a reload, or seen by a late joiner, must
           // not cover what everyone else sees.
-          let index = presentationAreaContentActions.length;
+          let index = nextPresentationAreaContentActions.length;
           while (index > 0 && ![
             PRESENTATION_AREA.GENERIC_CONTENT,
             PRESENTATION_AREA.WHITEBOARD_OPEN,
-          ].includes(presentationAreaContentActions[index - 1].value.content)) {
+          ].includes(nextPresentationAreaContentActions[index - 1].value.content)) {
             index -= 1;
           }
-          presentationAreaContentActions.splice(index, 0, { ...action, value });
+          nextPresentationAreaContentActions.splice(index, 0, { ...action, value });
         } else {
-          presentationAreaContentActions.push({ ...action, value });
+          nextPresentationAreaContentActions.push({ ...action, value });
         }
-      } else {
-        let indexesOfOpenedContent = presentationAreaContentActions.reduce((indexes, p, index) => {
-          if (action.value.content === PRESENTATION_AREA.GENERIC_CONTENT) {
-            // Not filtered by open: minimizing the presentation area marks its top
-            // item as closed, and that item must still go away when the plugin removes it
-            if (
-              p.value.content === action.value.content
-              && p.value.genericContentId === action.value.genericContentId
-            ) {
-              indexes.push(index);
-            }
-          } else if (p.value.content === action.value.content) {
+        return {
+          ...state,
+          presentationAreaContentActions: nextPresentationAreaContentActions,
+        };
+      }
+
+      const indexesOfOpenedContent = presentationAreaContentActions.reduce((indexes, p, index) => {
+        if (action.value.content === PRESENTATION_AREA.GENERIC_CONTENT) {
+          // Not filtered by open: minimizing the presentation area marks its top
+          // item as closed, and that item must still go away when the plugin removes it
+          if (
+            p.value.content === action.value.content
+            && p.value.genericContentId === action.value.genericContentId
+          ) {
             indexes.push(index);
           }
-          return indexes;
-        }, []);
-        indexesOfOpenedContent = indexesOfOpenedContent.length > 0 ? indexesOfOpenedContent : -1;
-        if (
-          indexesOfOpenedContent !== -1
-        ) {
-          indexesOfOpenedContent.reverse().forEach((index) => {
-            presentationAreaContentActions.splice(index, 1);
-          });
+        } else if (p.value.content === action.value.content) {
+          indexes.push(index);
         }
+        return indexes;
+      }, []);
+
+      if (indexesOfOpenedContent.length === 0) {
+        return state;
       }
+
+      const nextPresentationAreaContentActions = presentationAreaContentActions.slice();
+      indexesOfOpenedContent.reverse().forEach((index) => {
+        nextPresentationAreaContentActions.splice(index, 1);
+      });
+
       return {
         ...state,
-        presentationAreaContentActions,
+        presentationAreaContentActions: nextPresentationAreaContentActions,
       };
     }
     default: {
@@ -1970,10 +2062,7 @@ const LayoutContextProvider = (props) => {
     }],
   );
 
-  const { data: currentMeeting } = useMeeting((m) => ({
-    componentsFlags: m.componentsFlags,
-    layout: m.layout,
-  }));
+  const { data: currentMeeting } = useMeeting(projectMeetingForLayout);
 
   const isSharedNotesPinned = currentMeeting?.componentsFlags?.isSharedNotesPinned;
 
@@ -2017,7 +2106,7 @@ const LayoutContextProvider = (props) => {
         followerPresentationOpen,
       );
     }
-  }, [layoutContextState, isPresentationEnabled]);
+  }, [layoutContextState.presentationAreaContentActions, isPresentationEnabled]);
   useEffect(() => {
     if (typeof isSharedNotesPinned === 'boolean') {
       layoutContextDispatch({
@@ -2034,14 +2123,12 @@ const LayoutContextProvider = (props) => {
     }
   }, [isSharedNotesPinned]);
   useUpdatePresentationAreaContentForPlugin(layoutContextState);
+  const contextValue = useMemo(
+    () => [layoutContextState, layoutContextDispatch],
+    [layoutContextState],
+  );
   return (
-    <LayoutContextSelector.Provider value={
-      [
-        layoutContextState,
-        layoutContextDispatch,
-      ]
-    }
-    >
+    <LayoutContextSelector.Provider value={contextValue}>
       {children}
     </LayoutContextSelector.Provider>
   );
