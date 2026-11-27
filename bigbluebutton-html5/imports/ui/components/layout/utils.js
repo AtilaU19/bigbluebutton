@@ -135,6 +135,17 @@ const suportedLayouts = [
       DEVICE_TYPE.DESKTOP,
     ],
   },
+  {
+    layoutKey: LAYOUT_TYPE.PLUGINS_ONLY,
+    layoutName: 'Plugins Only',
+    suportedDevices: [
+      DEVICE_TYPE.MOBILE,
+      DEVICE_TYPE.TABLET,
+      DEVICE_TYPE.TABLET_PORTRAIT,
+      DEVICE_TYPE.TABLET_LANDSCAPE,
+      DEVICE_TYPE.DESKTOP,
+    ],
+  },
 ];
 
 const COMMON_ELEMENTS = {
@@ -201,7 +212,8 @@ const layoutAllowedInSettings = (layout) => layout !== LAYOUT_TYPE.CAMERAS_ONLY
   && layout !== LAYOUT_TYPE.PRESENTATION_ONLY
   && layout !== LAYOUT_TYPE.PARTICIPANTS_AND_CHAT_ONLY
   && layout !== LAYOUT_TYPE.MEDIA_ONLY
-  && layout !== LAYOUT_TYPE.UNIFIED_LAYOUT;
+  && layout !== LAYOUT_TYPE.UNIFIED_LAYOUT
+  && layout !== LAYOUT_TYPE.PLUGINS_ONLY;
 
 const getDeviceType = () => {
   let deviceType = null;

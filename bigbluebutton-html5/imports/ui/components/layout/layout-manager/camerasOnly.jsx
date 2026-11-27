@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
-import { throttle } from '/imports/utils/throttle';
+import React, { useEffect, useState } from 'react';
 import {
   layoutDispatch,
   layoutSelect,
   layoutSelectInput,
+  layoutSelectOutput,
 } from '/imports/ui/components/layout/context';
 import DEFAULT_VALUES from '/imports/ui/components/layout/defaultValues';
 import { INITIAL_INPUT_STATE } from '/imports/ui/components/layout/initState';
@@ -12,26 +12,39 @@ import { defaultsDeep } from '/imports/utils/array-utils';
 import Session from '/imports/ui/services/storage/in-memory';
 
 const CamerasOnlyLayout = (props) => {
-  const { bannerAreaHeight, isMobile, calculatesNavbarHeight } = props;
+  const {
+    bannerAreaHeight, isMobile, calculatesNavbarHeight, isPresentationEnabled,
+  } = props;
 
-  function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  }
-
-  const input = layoutSelect((i) => i.input);
   const deviceType = layoutSelect((i) => i.deviceType);
   const isRTL = layoutSelect((i) => i.isRTL);
-  const fullscreen = layoutSelect((i) => i.fullscreen);
+  const fullscreenGroup = layoutSelect((i) => i.fullscreen.group);
   const fontSize = layoutSelect((i) => i.fontSize);
-  const currentPanelType = layoutSelect((i) => i.currentPanelType);
-  const navbarInput = layoutSelectInput((i) => i.navBar);
-  const actionbarInput = layoutSelectInput((i) => i.actionBar);
+
+  const browserWidth = layoutSelectInput((i) => i.browser.width);
+  const browserHeight = layoutSelectInput((i) => i.browser.height);
+  const bannerBarHasBanner = layoutSelectInput((i) => i.bannerBar.hasBanner);
+  const notificationsBarHasNotification = layoutSelectInput(
+    (i) => i.notificationsBar.hasNotification,
+  );
+  const navBarHasNavBar = layoutSelectInput((i) => i.navBar.hasNavBar);
+  const navBarHideTopRow = layoutSelectOutput((i) => i.navBar.hideTopRow);
+  const actionBarHasActionBar = layoutSelectInput((i) => i.actionBar.hasActionBar);
+  const sidebarNavigationIsOpen = layoutSelectInput((i) => i.sidebarNavigation.isOpen);
+  const sidebarContentIsOpen = layoutSelectInput((i) => i.sidebarContent.isOpen);
+  const sidebarContentWidthInput = layoutSelectInput((i) => i.sidebarContent.width);
+  const cameraDockNumCameras = layoutSelectInput((i) => i.cameraDock.numCameras);
+  const presentationIsOpen = layoutSelectInput((i) => i.presentation.isOpen);
+  const presentationSlidesLength = layoutSelectInput((i) => i.presentation.slidesLength);
+  const externalVideoHasExternalVideo = layoutSelectInput(
+    (i) => i.externalVideo.hasExternalVideo,
+  );
+  const genericContentId = layoutSelectInput((i) => i.genericMainContent.genericContentId);
+  const screenShareHasScreenShare = layoutSelectInput((i) => i.screenShare.hasScreenShare);
+  const sharedNotesIsPinned = layoutSelectInput((i) => i.sharedNotes.isPinned);
+
   const layoutContextDispatch = layoutDispatch();
-  const prevDeviceType = usePrevious(deviceType);
+  const [initializedDeviceType, setInitializedDeviceType] = useState(null);
 
   const calculatesCameraDockBounds = (mediaAreaBounds, sidebarSize) => {
     const { baseCameraDockBounds } = props;
@@ -122,7 +135,7 @@ const CamerasOnlyLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_NAVBAR_OUTPUT,
       value: {
-        display: navbarInput.hasNavBar,
+        display: navBarHasNavBar,
         width: navbarBounds.width,
         height: navbarBounds.height,
         top: navbarBounds.top,
@@ -135,7 +148,7 @@ const CamerasOnlyLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_ACTIONBAR_OUTPUT,
       value: {
-        display: actionbarInput.hasActionBar,
+        display: actionBarHasActionBar,
         width: actionbarBounds.width,
         height: actionbarBounds.height,
         innerHeight: actionbarBounds.innerHeight,
@@ -186,7 +199,6 @@ const CamerasOnlyLayout = (props) => {
         top: sidebarContentBounds.top,
         left: sidebarContentBounds.left,
         right: sidebarContentBounds.right,
-        currentPanelType,
         tabOrder: DEFAULT_VALUES.sidebarContentTabOrder,
         isResizable: !isMobile && !isTablet,
         zIndex: sidebarContentBounds.zIndex,
@@ -233,7 +245,6 @@ const CamerasOnlyLayout = (props) => {
           left: false,
         },
         zIndex: cameraDockBounds.zIndex,
-        focusedId: input.cameraDock.focusedId,
       },
     });
 
@@ -327,23 +338,6 @@ const CamerasOnlyLayout = (props) => {
     });
   };
 
-  const throttledCalculatesLayout = throttle(() => calculatesLayout(), 50, {
-    trailing: true,
-    leading: true,
-  });
-
-  useEffect(() => {
-    window.addEventListener('resize', () => {
-      layoutContextDispatch({
-        type: ACTIONS.SET_BROWSER_SIZE,
-        value: {
-          width: window.document.documentElement.clientWidth,
-          height: window.document.documentElement.clientHeight,
-        },
-      });
-    });
-  }, []);
-
   const init = () => {
     const hasLayoutEngineLoadedOnce = Session.getItem('hasLayoutEngineLoadedOnce');
     layoutContextDispatch({
@@ -383,22 +377,45 @@ const CamerasOnlyLayout = (props) => {
       },
     });
     Session.setItem('layoutReady', true);
-    throttledCalculatesLayout();
   };
 
-  // eslint-disable-next-line consistent-return
   useEffect(() => {
-    if (deviceType === null) return () => null;
-
-    if (deviceType !== prevDeviceType) {
-      // reset layout if deviceType changed
-      // not all options is supported in all devices
+    if (deviceType === null) return;
+    if (deviceType !== initializedDeviceType) {
       init();
-    } else {
-      throttledCalculatesLayout();
+      setInitializedDeviceType(deviceType);
     }
-  }, [input, deviceType, isRTL, fontSize, fullscreen]);
+  }, [deviceType, initializedDeviceType]);
+
+  useEffect(() => {
+    if (deviceType === null || initializedDeviceType !== deviceType) return;
+    calculatesLayout();
+  }, [
+    initializedDeviceType,
+    deviceType,
+    isRTL,
+    fontSize,
+    isPresentationEnabled,
+    fullscreenGroup,
+    browserWidth,
+    browserHeight,
+    bannerBarHasBanner,
+    notificationsBarHasNotification,
+    navBarHasNavBar,
+    navBarHideTopRow,
+    actionBarHasActionBar,
+    sidebarNavigationIsOpen,
+    sidebarContentIsOpen,
+    sidebarContentWidthInput,
+    cameraDockNumCameras,
+    presentationIsOpen,
+    presentationSlidesLength,
+    externalVideoHasExternalVideo,
+    genericContentId,
+    screenShareHasScreenShare,
+    sharedNotesIsPinned,
+  ]);
   return null;
 };
 
-export default CamerasOnlyLayout;
+export default React.memo(CamerasOnlyLayout);

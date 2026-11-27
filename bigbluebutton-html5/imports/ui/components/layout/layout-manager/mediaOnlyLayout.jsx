@@ -1,6 +1,10 @@
-import { useEffect, useRef } from 'react';
-import { throttle } from '/imports/utils/throttle';
-import { layoutDispatch, layoutSelect, layoutSelectInput } from '/imports/ui/components/layout/context';
+import React, { useEffect, useState } from 'react';
+import {
+  layoutDispatch,
+  layoutSelect,
+  layoutSelectInput,
+  layoutSelectOutput,
+} from '/imports/ui/components/layout/context';
 import DEFAULT_VALUES from '/imports/ui/components/layout/defaultValues';
 import { INITIAL_INPUT_STATE } from '/imports/ui/components/layout/initState';
 import {
@@ -13,52 +17,47 @@ const windowWidth = () => window.document.documentElement.clientWidth;
 const windowHeight = () => window.document.documentElement.clientHeight;
 
 const MediaOnlyLayout = (props) => {
-  const { isMobile } = props;
+  const { isMobile, isPresentationEnabled } = props;
 
-  function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  }
-
-  const input = layoutSelect((i) => i.input);
   const deviceType = layoutSelect((i) => i.deviceType);
   const isRTL = layoutSelect((i) => i.isRTL);
-  const fullscreen = layoutSelect((i) => i.fullscreen);
+  const fullscreenElement = layoutSelect((i) => i.fullscreen.element);
+  const fullscreenGroup = layoutSelect((i) => i.fullscreen.group);
   const fontSize = layoutSelect((i) => i.fontSize);
-  const currentPanelType = layoutSelect((i) => i.currentPanelType);
 
-  const navbarInput = layoutSelectInput((i) => i.navBar);
-  const presentationInput = layoutSelectInput((i) => i.presentation);
-  const cameraDockInput = layoutSelectInput((i) => i.cameraDock);
-  const actionbarInput = layoutSelectInput((i) => i.actionBar);
-  const externalVideoInput = layoutSelectInput((i) => i.externalVideo);
-  const genericMainContentInput = layoutSelectInput((i) => i.genericMainContent);
-  const screenShareInput = layoutSelectInput((i) => i.screenShare);
-  const sharedNotesInput = layoutSelectInput((i) => i.sharedNotes);
+  const browserWidth = layoutSelectInput((i) => i.browser.width);
+  const browserHeight = layoutSelectInput((i) => i.browser.height);
+  const bannerBarHasBanner = layoutSelectInput((i) => i.bannerBar.hasBanner);
+  const notificationsBarHasNotification = layoutSelectInput(
+    (i) => i.notificationsBar.hasNotification,
+  );
+  const navBarHasNavBar = layoutSelectInput((i) => i.navBar.hasNavBar);
+  const navBarHideTopRow = layoutSelectOutput((i) => i.navBar.hideTopRow);
+  const presentationIsOpen = layoutSelectInput((i) => i.presentation.isOpen);
+  const presentationSlidesLength = layoutSelectInput((i) => i.presentation.slidesLength);
+  const slideWidthInput = layoutSelectInput(
+    (i) => i.presentation.currentSlide?.size?.width ?? 0,
+  );
+  const slideHeightInput = layoutSelectInput(
+    (i) => i.presentation.currentSlide?.size?.height ?? 0,
+  );
+  const cameraDockNumCameras = layoutSelectInput((i) => i.cameraDock.numCameras);
+  const cameraDockIsDragging = layoutSelectInput((i) => i.cameraDock.isDragging);
+  const actionBarHasActionBar = layoutSelectInput((i) => i.actionBar.hasActionBar);
+  const externalVideoHasExternalVideo = layoutSelectInput(
+    (i) => i.externalVideo.hasExternalVideo,
+  );
+  const genericContentId = layoutSelectInput((i) => i.genericMainContent.genericContentId);
+  const screenShareHasScreenShare = layoutSelectInput((i) => i.screenShare.hasScreenShare);
+  const screenShareWidth = layoutSelectInput((i) => i.screenShare.width);
+  const screenShareHeight = layoutSelectInput((i) => i.screenShare.height);
+  const sharedNotesIsPinned = layoutSelectInput((i) => i.sharedNotes.isPinned);
   const layoutContextDispatch = layoutDispatch();
 
-  const prevDeviceType = usePrevious(deviceType);
-  const { isPresentationEnabled } = props;
-
-  useEffect(() => {
-    window.addEventListener('resize', () => {
-      layoutContextDispatch({
-        type: ACTIONS.SET_BROWSER_SIZE,
-        value: {
-          width: window.document.documentElement.clientWidth,
-          height: window.document.documentElement.clientHeight,
-        },
-      });
-    });
-  }, []);
+  const [initializedDeviceType, setInitializedDeviceType] = useState(null);
 
   const calculatesSlideSize = (mediaAreaBounds) => {
-    const { currentSlide } = presentationInput;
-
-    if (currentSlide.size.width === 0 && currentSlide.size.height === 0) {
+    if (slideWidthInput === 0 && slideHeightInput === 0) {
       return {
         width: 0,
         height: 0,
@@ -68,12 +67,12 @@ const MediaOnlyLayout = (props) => {
     let slideWidth;
     let slideHeight;
 
-    slideWidth = (currentSlide.size.width * mediaAreaBounds.height) / currentSlide.size.height;
+    slideWidth = (slideWidthInput * mediaAreaBounds.height) / slideHeightInput;
     slideHeight = mediaAreaBounds.height;
 
     if (slideWidth > mediaAreaBounds.width) {
       slideWidth = mediaAreaBounds.width;
-      slideHeight = (currentSlide.size.height * mediaAreaBounds.width) / currentSlide.size.width;
+      slideHeight = (slideHeightInput * mediaAreaBounds.width) / slideWidthInput;
     }
 
     return {
@@ -83,7 +82,8 @@ const MediaOnlyLayout = (props) => {
   };
 
   const calculatesScreenShareSize = (mediaAreaBounds) => {
-    const { width = 0, height = 0 } = screenShareInput;
+    const width = screenShareWidth || 0;
+    const height = screenShareHeight || 0;
 
     if (width === 0 && height === 0) return { width, height };
 
@@ -153,20 +153,13 @@ const MediaOnlyLayout = (props) => {
   };
 
   const calculatesMediaBounds = (mediaAreaBounds, slideSize, sidebarSize, screenShareSize) => {
-    const { isOpen, slidesLength } = presentationInput;
-    const { hasExternalVideo } = externalVideoInput;
-    const { genericContentId } = genericMainContentInput;
-    const { hasScreenShare } = screenShareInput;
-    const { isPinned: isSharedNotesPinned } = sharedNotesInput;
-
-    const hasPresentation = isPresentationEnabled && slidesLength !== 0;
-    const isGeneralMediaOff = !hasPresentation && !hasExternalVideo
-      && !hasScreenShare && !isSharedNotesPinned && !genericContentId;
+    const hasPresentation = isPresentationEnabled && presentationSlidesLength !== 0;
+    const isGeneralMediaOff = !hasPresentation && !externalVideoHasExternalVideo
+      && !screenShareHasScreenShare && !sharedNotesIsPinned && !genericContentId;
 
     const mediaBounds = {};
-    const { element: fullscreenElement } = fullscreen;
 
-    if (!isOpen || isGeneralMediaOff) {
+    if (!presentationIsOpen || isGeneralMediaOff) {
       mediaBounds.width = 0;
       mediaBounds.height = 0;
       mediaBounds.top = 0;
@@ -191,11 +184,11 @@ const MediaOnlyLayout = (props) => {
       return mediaBounds;
     }
 
-    const mediaContentSize = hasScreenShare ? screenShareSize : slideSize;
+    const mediaContentSize = screenShareHasScreenShare ? screenShareSize : slideSize;
 
-    if (cameraDockInput.numCameras > 0 && !cameraDockInput.isDragging) {
+    if (cameraDockNumCameras > 0 && !cameraDockIsDragging) {
       if (mediaContentSize.width !== 0 && mediaContentSize.height !== 0
-        && !hasExternalVideo && !genericContentId) {
+        && !externalVideoHasExternalVideo && !genericContentId) {
         if (mediaContentSize.width < mediaAreaBounds.width && !isMobile) {
           if (mediaContentSize.width < mediaAreaBounds.width * 0.8) {
             mediaBounds.width = mediaContentSize.width;
@@ -272,7 +265,7 @@ const MediaOnlyLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_NAVBAR_OUTPUT,
       value: {
-        display: navbarInput.hasNavBar,
+        display: navBarHasNavBar,
         width: navbarBounds.width,
         height: navbarBounds.height,
         top: navbarBounds.top,
@@ -285,7 +278,7 @@ const MediaOnlyLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_ACTIONBAR_OUTPUT,
       value: {
-        display: actionbarInput.hasActionBar,
+        display: actionBarHasActionBar,
         width: actionbarBounds.width,
         height: actionbarBounds.height,
         innerHeight: actionbarBounds.innerHeight,
@@ -325,7 +318,6 @@ const MediaOnlyLayout = (props) => {
         top: 0,
         left: 0,
         right: 0,
-        currentPanelType,
         tabOrder: DEFAULT_VALUES.sidebarContentTabOrder,
         isResizable: false,
         zIndex: sidebarContentBounds.zIndex,
@@ -353,7 +345,7 @@ const MediaOnlyLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_CAMERA_DOCK_OUTPUT,
       value: {
-        display: cameraDockInput.numCameras > 0,
+        display: cameraDockNumCameras > 0,
         position: cameraDockBounds.position,
         minWidth: cameraDockBounds.minWidth,
         width: cameraDockBounds.width,
@@ -373,14 +365,13 @@ const MediaOnlyLayout = (props) => {
           left: false,
         },
         zIndex: cameraDockBounds.zIndex,
-        focusedId: input.cameraDock.focusedId,
       },
     });
 
     layoutContextDispatch({
       type: ACTIONS.SET_PRESENTATION_OUTPUT,
       value: {
-        display: presentationInput.isOpen,
+        display: presentationIsOpen,
         width: mediaBounds.width,
         height: mediaBounds.height,
         top: mediaBounds.top,
@@ -407,7 +398,7 @@ const MediaOnlyLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_EXTERNAL_VIDEO_OUTPUT,
       value: {
-        display: externalVideoInput.hasExternalVideo,
+        display: externalVideoHasExternalVideo,
         width: mediaBounds.width,
         height: mediaBounds.height,
         top: mediaBounds.top,
@@ -438,11 +429,6 @@ const MediaOnlyLayout = (props) => {
       },
     });
   };
-
-  const throttledCalculatesLayout = throttle(() => calculatesLayout(), 50, {
-    trailing: true,
-    leading: true,
-  });
 
   const init = () => {
     const hasLayoutEngineLoadedOnce = Session.getItem('hasLayoutEngineLoadedOnce');
@@ -493,23 +479,49 @@ const MediaOnlyLayout = (props) => {
       },
     });
     Session.setItem('layoutReady', true);
-    throttledCalculatesLayout();
   };
 
   useEffect(() => {
-    if (deviceType === null) return () => null;
-
-    if (deviceType !== prevDeviceType) {
-      // reset layout if deviceType changed
-      // not all options is supported in all devices
+    if (deviceType === null) return;
+    if (deviceType !== initializedDeviceType) {
       init();
-    } else {
-      throttledCalculatesLayout();
+      setInitializedDeviceType(deviceType);
     }
-    return () => {};
-  }, [input, deviceType, isRTL, fontSize, fullscreen, isPresentationEnabled]);
+  }, [deviceType, initializedDeviceType]);
+
+  useEffect(() => {
+    if (deviceType === null || initializedDeviceType !== deviceType) return;
+    calculatesLayout();
+  }, [
+    initializedDeviceType,
+    deviceType,
+    isRTL,
+    fontSize,
+    isPresentationEnabled,
+    fullscreenElement,
+    fullscreenGroup,
+    browserWidth,
+    browserHeight,
+    bannerBarHasBanner,
+    notificationsBarHasNotification,
+    navBarHasNavBar,
+    navBarHideTopRow,
+    actionBarHasActionBar,
+    presentationIsOpen,
+    presentationSlidesLength,
+    slideWidthInput,
+    slideHeightInput,
+    cameraDockNumCameras,
+    cameraDockIsDragging,
+    externalVideoHasExternalVideo,
+    genericContentId,
+    screenShareHasScreenShare,
+    screenShareWidth,
+    screenShareHeight,
+    sharedNotesIsPinned,
+  ]);
 
   return null;
 };
 
-export default MediaOnlyLayout;
+export default React.memo(MediaOnlyLayout);

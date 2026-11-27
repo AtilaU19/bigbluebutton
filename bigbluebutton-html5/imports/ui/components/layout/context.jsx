@@ -143,9 +143,10 @@ const reducer = (state, action) => {
     case ACTIONS.SET_FOCUSED_CAMERA_ID: {
       const { cameraDock } = state.input;
       const { focusedId } = cameraDock;
+      const outputCameraDock = state.output.cameraDock;
       const { value, isLocalChange = true } = action;
 
-      if (focusedId === value) return state;
+      if (focusedId === value && outputCameraDock.focusedId === value) return state;
 
       return {
         ...state,
@@ -155,6 +156,13 @@ const reducer = (state, action) => {
             ...cameraDock,
             focusedId: value,
             isLocalChange,
+          },
+        },
+        output: {
+          ...state.output,
+          cameraDock: {
+            ...outputCameraDock,
+            focusedId: value,
           },
         },
       };
@@ -1238,6 +1246,9 @@ const reducer = (state, action) => {
         isLocalOnly = false,
       } = action.value;
       const { cameraDock } = state.output;
+      const resolvedFocusedId = focusedId !== undefined
+        ? focusedId
+        : state.input.cameraDock.focusedId;
       if (cameraDock.display === display
         && cameraDock.position === position
         && cameraDock.minWidth === minWidth
@@ -1254,7 +1265,7 @@ const reducer = (state, action) => {
         && cameraDock.isDraggable === isDraggable
         && cameraDock.zIndex === zIndex
         && areResizableEdgesEqual(cameraDock.resizableEdge, resizableEdge)
-        && cameraDock.focusedId === focusedId
+        && cameraDock.focusedId === resolvedFocusedId
         && cameraDock.isLocalOnly === isLocalOnly) {
         return state;
       }
@@ -1280,7 +1291,7 @@ const reducer = (state, action) => {
             isDraggable,
             resizableEdge,
             zIndex,
-            focusedId,
+            focusedId: resolvedFocusedId,
             isLocalOnly,
           },
         },

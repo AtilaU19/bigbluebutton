@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { layoutDispatch, layoutSelect, layoutSelectInput } from './context';
 import {
   ACTIONS, DEVICE_TYPE, LAYOUT_TYPE, PANELS,
@@ -20,6 +20,7 @@ import { useVideoStreamsCount } from '/imports/ui/components/video-provider/hook
 import { useIsChatEnabled, useIsPresentationEnabled, useIsScreenSharingEnabled } from '/imports/ui/services/features';
 import useUserChangedLocalSettings from '/imports/ui/services/settings/hooks/useUserChangedLocalSettings';
 import Session from '/imports/ui/services/storage/in-memory';
+import { STORAGES, useStorageKey } from '/imports/ui/services/storage/hooks';
 import deviceInfo from '/imports/utils/deviceInfo';
 import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
 import {
@@ -27,32 +28,36 @@ import {
   CurrentPresentationPageSubscriptionResponse,
 } from '/imports/ui/components/whiteboard/queries';
 
-const MOBILE_MEDIA = 'only screen and (max-width: 40em)';
 const ORIENTATION_MEDIA = '(orientation: portrait)';
 const ORIENTATION_SETTLE_DELAY = 250;
+
+type MeetingProjectionArg = Parameters<NonNullable<Parameters<typeof useMeeting>[0]>>[0];
+
+const projectMeetingForObserver = (m: MeetingProjectionArg) => ({
+  layout: m.layout ? { currentLayoutType: m.layout.currentLayoutType } : m.layout,
+  componentsFlags: m.componentsFlags
+    ? { hasExternalVideo: m.componentsFlags.hasExternalVideo }
+    : m.componentsFlags,
+  isBreakout: m.isBreakout,
+});
 
 const LayoutObserver: React.FC = () => {
   const layoutType = useRef<string | null>(null);
   const checkedUserSettings = useRef(false);
   const layoutContextDispatch = layoutDispatch();
   const deviceType = layoutSelect((i: Layout) => i.deviceType);
-  const cameraDockInput = layoutSelectInput((i: Input) => i.cameraDock);
-  const sidebarContentInput = layoutSelectInput((i: Input) => i.sidebarContent);
-  const presentationInput = layoutSelectInput((i: Input) => i.presentation);
-  const sharedNotesInput = layoutSelectInput((i: Input) => i.sharedNotes);
+  const hasCameras = layoutSelectInput((i: Input) => (i.cameraDock.numCameras ?? 0) > 0);
+  const sidebarContentIsOpen = layoutSelectInput((i: Input) => i.sidebarContent.isOpen);
+  const presentationIsOpen = layoutSelectInput((i: Input) => i.presentation.isOpen);
+  const isSharedNotesPinned = layoutSelectInput((i: Input) => i.sharedNotes.isPinned);
 
-  const [layoutIsReady, setLayoutIsReady] = useState(false);
-  const [, setEnableResize] = useState(!window.matchMedia(MOBILE_MEDIA).matches);
+  const layoutReady = useStorageKey('layoutReady', STORAGES.IN_MEMORY) === true;
   const layoutSettings = useSettings(SETTINGS.LAYOUT) as { selectedLayout: string };
   const { selectedLayout } = layoutSettings;
   const {
     data: currentMeeting,
     loading: loadingMeeting,
-  } = useMeeting((m) => ({
-    layout: m.layout,
-    componentsFlags: m.componentsFlags,
-    isBreakout: m.isBreakout,
-  }));
+  } = useMeeting(projectMeetingForObserver);
 
   const {
     data: presentationPageData,
@@ -115,10 +120,6 @@ const LayoutObserver: React.FC = () => {
 
   const setLocalSettings = useUserChangedLocalSettings();
 
-  const { numCameras } = cameraDockInput;
-  const { isOpen: sidebarContentIsOpen } = sidebarContentInput;
-  const { isOpen: presentationIsOpen } = presentationInput;
-
   const { currentLayoutType } = currentMeeting?.layout || {};
   const meetingLayout = currentLayoutType && LAYOUT_TYPE[currentLayoutType as keyof typeof LAYOUT_TYPE];
   const isSharingVideo = currentMeeting?.componentsFlags?.hasExternalVideo;
@@ -132,8 +133,7 @@ const LayoutObserver: React.FC = () => {
     });
   };
 
-  // Duplicates each layout manager's own `resize` dispatch, for the sake of the
-  // orientation resamples, which no `resize` event follows.
+  // Single source of truth for ACTIONS.SET_BROWSER_SIZE across resize and orientation resamples.
   const setBrowserSize = () => {
     layoutContextDispatch({
       type: ACTIONS.SET_BROWSER_SIZE,
@@ -144,14 +144,7 @@ const LayoutObserver: React.FC = () => {
     });
   };
 
-  const throttledDeviceType = throttle(
-    () => setDeviceType(),
-    50, { trailing: true, leading: true },
-  );
-
   useEffect(() => {
-    const Settings = getSettingsSingletonInstance();
-
     layoutContextDispatch({
       type: ACTIONS.SET_IS_RTL,
       value: document.documentElement.getAttribute('dir') === 'rtl',
@@ -186,30 +179,26 @@ const LayoutObserver: React.FC = () => {
       value: getFromUserSettings('bbb_hide_notifications', false),
     });
 
-    window.addEventListener('localeChanged', () => {
-      layoutContextDispatch({
-        type: ACTIONS.SET_IS_RTL,
-        value: Settings.application.isRTL,
-      });
-    });
-
-    const handleWindowResize = throttle(() => {
-      setEnableResize((enableResize) => {
-        const shouldEnableResize = !window.matchMedia(MOBILE_MEDIA).matches;
-        if (enableResize === shouldEnableResize) return enableResize;
-        return shouldEnableResize;
-      });
-      throttledDeviceType();
+    const syncWindowSize = () => {
+      setDeviceType();
       setBrowserSize();
-    });
+    };
 
+    const handleWindowResize = throttle(
+      syncWindowSize,
+      50,
+      { leading: true, trailing: true },
+    );
+
+    let orientationRafId: number | undefined;
     let orientationSettleTimeout: ReturnType<typeof setTimeout> | undefined;
 
     const handleOrientationChange = () => {
-      handleWindowResize();
-      window.requestAnimationFrame(handleWindowResize);
+      syncWindowSize();
+      if (orientationRafId !== undefined) window.cancelAnimationFrame(orientationRafId);
+      orientationRafId = window.requestAnimationFrame(syncWindowSize);
       clearTimeout(orientationSettleTimeout);
-      orientationSettleTimeout = setTimeout(handleWindowResize, ORIENTATION_SETTLE_DELAY);
+      orientationSettleTimeout = setTimeout(syncWindowSize, ORIENTATION_SETTLE_DELAY);
     };
 
     const orientationQuery = window.matchMedia(ORIENTATION_MEDIA);
@@ -217,7 +206,7 @@ const LayoutObserver: React.FC = () => {
     // here would take that fallback and the cleanup down with it.
     const supportsQueryListener = typeof orientationQuery.addEventListener === 'function';
 
-    handleWindowResize();
+    syncWindowSize();
     window.addEventListener('resize', handleWindowResize, false);
     window.addEventListener('orientationchange', handleOrientationChange, false);
     if (supportsQueryListener) {
@@ -225,6 +214,8 @@ const LayoutObserver: React.FC = () => {
     }
 
     return () => {
+      handleWindowResize.cancel();
+      if (orientationRafId !== undefined) window.cancelAnimationFrame(orientationRafId);
       clearTimeout(orientationSettleTimeout);
       window.removeEventListener('resize', handleWindowResize, false);
       window.removeEventListener('orientationchange', handleOrientationChange, false);
@@ -242,7 +233,7 @@ const LayoutObserver: React.FC = () => {
       selectedLayout?.toLowerCase?.()?.includes?.('focus')
       && !sidebarContentIsOpen
       && deviceType !== DEVICE_TYPE.MOBILE && deviceType !== DEVICE_TYPE.TABLET_LANDSCAPE
-      && numCameras > 0
+      && hasCameras
       && presentationIsOpen
       && !getFromUserSettings('bbb_hide_sidebar_navigation', false)
     ) {
@@ -264,15 +255,11 @@ const LayoutObserver: React.FC = () => {
   }, [selectedLayout]);
 
   useEffect(() => {
-    throttledDeviceType();
-  }, [deviceType]);
-
-  useEffect(() => {
     if (
       layoutContextDispatch
       && (typeof meetingLayout !== 'undefined')
       && (layoutType.current !== meetingLayout)
-      && sharedNotesInput?.isPinned
+      && isSharedNotesPinned
     ) {
       layoutType.current = meetingLayout;
       layoutContextDispatch({
@@ -280,21 +267,84 @@ const LayoutObserver: React.FC = () => {
         value: true,
       });
     }
-  }, [meetingLayout, layoutContextDispatch, layoutType]);
+  }, [meetingLayout, layoutContextDispatch, isSharedNotesPinned]);
 
   useEffect(() => {
     MediaService.buildLayoutWhenPresentationAreaIsDisabled(
       layoutContextDispatch,
       isSharingVideo,
-      sharedNotesInput?.isPinned,
+      isSharedNotesPinned,
       isThereWebcam,
       isScreenSharingEnabled,
       isPresentationEnabled,
     );
-  });
+  }, [
+    layoutContextDispatch,
+    isSharingVideo,
+    isSharedNotesPinned,
+    isThereWebcam,
+    isScreenSharingEnabled,
+    isPresentationEnabled,
+    presentationIsOpen,
+  ]);
 
   useEffect(() => {
-    if (layoutIsReady) {
+    if (layoutReady && !checkedUserSettings.current) {
+      const Settings = getSettingsSingletonInstance();
+      Settings.save(setLocalSettings);
+
+      layoutContextDispatch({
+        type: ACTIONS.SET_SIDEBAR_NAVIGATION_IS_OPEN,
+        value: true,
+      });
+
+      if (shouldOpenUserListPanel) {
+        layoutContextDispatch({
+          type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
+          value: true,
+        });
+        layoutContextDispatch({
+          type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
+          value: PANELS.USERLIST,
+        });
+      }
+
+      if (shouldOpenChatPanel) {
+        const PUBLIC_GROUP_CHAT_ID = window.meetingClientSettings.public.chat.public_group_id;
+
+        layoutContextDispatch({
+          type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
+          value: true,
+        });
+        layoutContextDispatch({
+          type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
+          value: PANELS.CHAT,
+        });
+        layoutContextDispatch({
+          type: ACTIONS.SET_ID_CHAT_OPEN,
+          value: PUBLIC_GROUP_CHAT_ID,
+        });
+      }
+
+      if (getFromUserSettings('bbb_hide_sidebar_navigation', false)) {
+        layoutContextDispatch({
+          type: ACTIONS.SET_SIDEBAR_NAVIGATION_IS_OPEN,
+          value: false,
+        });
+      }
+
+      checkedUserSettings.current = true;
+    }
+  }, [
+    layoutReady,
+    shouldOpenUserListPanel,
+    shouldOpenChatPanel,
+    layoutContextDispatch,
+    setLocalSettings,
+  ]);
+
+  useEffect(() => {
+    if (layoutReady) {
       if (shouldOpenChatPanel) {
         const PUBLIC_CHAT_ID = window.meetingClientSettings.public.chat.public_group_id;
         layoutContextDispatch({
@@ -316,64 +366,15 @@ const LayoutObserver: React.FC = () => {
         });
       }
     }
-  }, [initialSidebarContentPanel, layoutIsReady]);
-
-  useEffect(() => {
-    if (Session.equals('layoutReady', true)) {
-      if (!checkedUserSettings.current) {
-        const Settings = getSettingsSingletonInstance();
-        Settings.save(setLocalSettings);
-
-        layoutContextDispatch({
-          type: ACTIONS.SET_SIDEBAR_NAVIGATION_IS_OPEN,
-          value: true,
-        });
-
-        if (shouldOpenUserListPanel) {
-          layoutContextDispatch({
-            type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
-            value: true,
-          });
-          layoutContextDispatch({
-            type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
-            value: PANELS.USERLIST,
-          });
-        }
-
-        if (shouldOpenChatPanel) {
-          const PUBLIC_GROUP_CHAT_ID = window.meetingClientSettings.public.chat.public_group_id;
-
-          layoutContextDispatch({
-            type: ACTIONS.SET_SIDEBAR_CONTENT_IS_OPEN,
-            value: true,
-          });
-          layoutContextDispatch({
-            type: ACTIONS.SET_SIDEBAR_CONTENT_PANEL,
-            value: PANELS.CHAT,
-          });
-          layoutContextDispatch({
-            type: ACTIONS.SET_ID_CHAT_OPEN,
-            value: PUBLIC_GROUP_CHAT_ID,
-          });
-        }
-
-        if (getFromUserSettings('bbb_hide_sidebar_navigation', false)) {
-          layoutContextDispatch({
-            type: ACTIONS.SET_SIDEBAR_NAVIGATION_IS_OPEN,
-            value: false,
-          });
-        }
-
-        checkedUserSettings.current = true;
-      }
-
-      if (!layoutIsReady) {
-        setLayoutIsReady(true);
-      }
-    }
-  });
+  }, [
+    initialSidebarContentPanel,
+    layoutReady,
+    shouldOpenChatPanel,
+    shouldOpenUserListPanel,
+    layoutContextDispatch,
+  ]);
 
   return null;
 };
 
-export default LayoutObserver;
+export default React.memo(LayoutObserver);

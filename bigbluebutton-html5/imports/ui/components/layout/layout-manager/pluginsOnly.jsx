@@ -1,6 +1,10 @@
-import { useEffect, useRef } from 'react';
-import { throttle } from '/imports/utils/throttle';
-import { layoutDispatch, layoutSelect, layoutSelectInput } from '/imports/ui/components/layout/context';
+import React, { useEffect, useState } from 'react';
+import {
+  layoutDispatch,
+  layoutSelect,
+  layoutSelectInput,
+  layoutSelectOutput,
+} from '/imports/ui/components/layout/context';
 import DEFAULT_VALUES from '/imports/ui/components/layout/defaultValues';
 import { INITIAL_INPUT_STATE } from '/imports/ui/components/layout/initState';
 
@@ -14,30 +18,26 @@ import Session from '/imports/ui/services/storage/in-memory';
 const PluginsOnlyLayout = (props) => {
   const { isMobile } = props;
 
-  function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  }
-
-  const input = layoutSelect((i) => i.input);
   const deviceType = layoutSelect((i) => i.deviceType);
   const isRTL = layoutSelect((i) => i.isRTL);
-  const fullscreen = layoutSelect((i) => i.fullscreen);
   const fontSize = layoutSelect((i) => i.fontSize);
-  const currentPanelType = layoutSelect((i) => i.currentPanelType);
 
-  const presentationInput = layoutSelectInput((i) => i.presentation);
-
-  const sidebarContentInput = layoutSelectInput((i) => i.sidebarContent);
-  const cameraDockInput = layoutSelectInput((i) => i.cameraDock);
-  const actionbarInput = layoutSelectInput((i) => i.actionBar);
-  const navbarInput = layoutSelectInput((i) => i.navBar);
+  const browserWidth = layoutSelectInput((i) => i.browser.width);
+  const browserHeight = layoutSelectInput((i) => i.browser.height);
+  const bannerBarHasBanner = layoutSelectInput((i) => i.bannerBar.hasBanner);
+  const notificationsBarHasNotification = layoutSelectInput(
+    (i) => i.notificationsBar.hasNotification,
+  );
+  const presentationIsOpen = layoutSelectInput((i) => i.presentation.isOpen);
+  const sidebarNavigationIsOpen = layoutSelectInput((i) => i.sidebarNavigation.isOpen);
+  const sidebarContentIsOpen = layoutSelectInput((i) => i.sidebarContent.isOpen);
+  const cameraDockNumCameras = layoutSelectInput((i) => i.cameraDock.numCameras);
+  const actionBarHasActionBar = layoutSelectInput((i) => i.actionBar.hasActionBar);
+  const navBarHasNavBar = layoutSelectInput((i) => i.navBar.hasNavBar);
+  const navBarHideTopRow = layoutSelectOutput((i) => i.navBar.hideTopRow);
   const layoutContextDispatch = layoutDispatch();
 
-  const prevDeviceType = usePrevious(deviceType);
+  const [initializedDeviceType, setInitializedDeviceType] = useState(null);
 
   const calculatesSidebarNavHeight = () => 0;
 
@@ -95,6 +95,7 @@ const PluginsOnlyLayout = (props) => {
     const sidebarContentBounds = calculatesSidebarContentBounds(sidebarNavWidth.width);
     const mediaAreaBounds = {
       width: 0,
+      height: 0,
       left: 0,
     };
     const navbarBounds = calculatesNavbarBounds(mediaAreaBounds);
@@ -104,12 +105,11 @@ const PluginsOnlyLayout = (props) => {
     const mediaBounds = calculatesMediaBounds();
     const sidebarContentHeight = calculatesSidebarContentHeight();
     const cameraDockBounds = calculatesCameraDockBounds();
-    const { isOpen } = presentationInput;
 
     layoutContextDispatch({
       type: ACTIONS.SET_NAVBAR_OUTPUT,
       value: {
-        display: navbarInput.hasNavBar,
+        display: navBarHasNavBar,
         width: navbarBounds.width,
         height: navbarBounds.height,
         top: navbarBounds.top,
@@ -122,7 +122,7 @@ const PluginsOnlyLayout = (props) => {
     layoutContextDispatch({
       type: ACTIONS.SET_ACTIONBAR_OUTPUT,
       value: {
-        display: actionbarInput.hasActionBar,
+        display: actionBarHasActionBar,
         width: actionbarBounds.width,
         height: actionbarBounds.height,
         innerHeight: actionbarBounds.innerHeight,
@@ -161,19 +161,9 @@ const PluginsOnlyLayout = (props) => {
     });
 
     layoutContextDispatch({
-      type: ACTIONS.SET_SIDEBAR_NAVIGATION_RESIZABLE_EDGE,
-      value: {
-        top: false,
-        right: !isRTL,
-        bottom: false,
-        left: isRTL,
-      },
-    });
-
-    layoutContextDispatch({
       type: ACTIONS.SET_SIDEBAR_CONTENT_OUTPUT,
       value: {
-        display: sidebarContentInput.isOpen,
+        display: sidebarContentIsOpen,
         minWidth: sidebarContentWidth.minWidth,
         width: sidebarContentWidth.width,
         maxWidth: sidebarContentWidth.maxWidth,
@@ -183,7 +173,6 @@ const PluginsOnlyLayout = (props) => {
         top: navbarBounds.height,
         left: sidebarContentBounds.left,
         right: sidebarContentBounds.right,
-        currentPanelType,
         tabOrder: DEFAULT_VALUES.sidebarContentTabOrder,
         isResizable: !isMobile && !isTablet,
         zIndex: sidebarContentBounds.zIndex,
@@ -195,7 +184,7 @@ const PluginsOnlyLayout = (props) => {
       value: {
         top: false,
         right: !isRTL,
-        bottom: cameraDockInput.numCameras > 0,
+        bottom: cameraDockNumCameras > 0,
         left: isRTL,
       },
     });
@@ -230,7 +219,6 @@ const PluginsOnlyLayout = (props) => {
           bottom: false,
           left: false,
         },
-        focusedId: input.cameraDock.focusedId,
         zIndex: cameraDockBounds.zIndex,
       },
     });
@@ -291,33 +279,14 @@ const PluginsOnlyLayout = (props) => {
       type: ACTIONS.SET_SHARED_NOTES_OUTPUT,
       value: {
         display: false,
-        width: isOpen ? mediaBounds.width : 0,
-        height: isOpen ? mediaBounds.height : 0,
+        width: presentationIsOpen ? mediaBounds.width : 0,
+        height: presentationIsOpen ? mediaBounds.height : 0,
         top: mediaBounds.top,
         left: mediaBounds.left,
         right: mediaBounds.right,
       },
     });
   };
-
-  const throttledCalculatesLayout = throttle(() => calculatesLayout(),
-    50, { trailing: true, leading: true });
-
-  useEffect(() => {
-    const handleWindowResize = () => {
-      layoutContextDispatch({
-        type: ACTIONS.SET_BROWSER_SIZE,
-        value: {
-          width: window.document.documentElement.clientWidth,
-          height: window.document.documentElement.clientHeight,
-        },
-      });
-    };
-    window.addEventListener('resize', handleWindowResize);
-    return () => {
-      window.removeEventListener('resize', handleWindowResize);
-    };
-  }, []);
 
   const init = () => {
     const hasLayoutEngineLoadedOnce = Session.getItem('hasLayoutEngineLoadedOnce');
@@ -368,23 +337,38 @@ const PluginsOnlyLayout = (props) => {
       },
     });
     Session.setItem('layoutReady', true);
-    throttledCalculatesLayout();
   };
 
-  // eslint-disable-next-line consistent-return
   useEffect(() => {
-    if (deviceType === null) return () => null;
-
-    if (deviceType !== prevDeviceType) {
-      // reset layout if deviceType changed
-      // not all options is supported in all devices
+    if (deviceType === null) return;
+    if (deviceType !== initializedDeviceType) {
       init();
-    } else {
-      throttledCalculatesLayout();
+      setInitializedDeviceType(deviceType);
     }
-  }, [input, deviceType, isRTL, fontSize, fullscreen]);
+  }, [deviceType, initializedDeviceType]);
+
+  useEffect(() => {
+    if (deviceType === null || initializedDeviceType !== deviceType) return;
+    calculatesLayout();
+  }, [
+    initializedDeviceType,
+    deviceType,
+    isRTL,
+    fontSize,
+    browserWidth,
+    browserHeight,
+    bannerBarHasBanner,
+    notificationsBarHasNotification,
+    navBarHasNavBar,
+    navBarHideTopRow,
+    actionBarHasActionBar,
+    sidebarNavigationIsOpen,
+    sidebarContentIsOpen,
+    presentationIsOpen,
+    cameraDockNumCameras,
+  ]);
 
   return null;
 };
 
-export default PluginsOnlyLayout;
+export default React.memo(PluginsOnlyLayout);
