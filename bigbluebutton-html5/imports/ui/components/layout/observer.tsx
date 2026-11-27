@@ -1,11 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import { layoutDispatch, layoutSelect, layoutSelectInput } from './context';
 import {
-  ACTIONS, DEVICE_TYPE, LAYOUT_TYPE, PANELS,
+  ACTIONS, DEVICE_TYPE, PANELS,
 } from './enums';
 import {
   getDeviceType,
   getInitialSidebarContentPanel,
+  resolveMeetingLayoutType,
 } from './utils';
 import { getSettingsSingletonInstance } from '/imports/ui/services/settings';
 import { getInitialFontSize } from '/imports/ui/components/settings/service';
@@ -121,7 +122,7 @@ const LayoutObserver: React.FC = () => {
   const setLocalSettings = useUserChangedLocalSettings();
 
   const { currentLayoutType } = currentMeeting?.layout || {};
-  const meetingLayout = currentLayoutType && LAYOUT_TYPE[currentLayoutType as keyof typeof LAYOUT_TYPE];
+  const meetingLayout = resolveMeetingLayoutType(currentLayoutType);
   const isSharingVideo = currentMeeting?.componentsFlags?.hasExternalVideo;
 
   // Not compared to `deviceType`: the resize listener captures it on mount, and the

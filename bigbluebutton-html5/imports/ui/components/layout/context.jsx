@@ -1178,9 +1178,11 @@ const reducer = (state, action) => {
     case ACTIONS.SET_CAMERA_DOCK_SIZE: {
       const { value, isLocalChange = true } = action;
       const {
-        width, height, browserWidth, browserHeight,
+        browserWidth, browserHeight,
       } = value;
       const { cameraDock } = state.input;
+      const width = value.width ?? cameraDock.width;
+      const height = value.height ?? cameraDock.height;
       if (cameraDock.width === width
         && cameraDock.height === height
         && cameraDock.browserWidth === browserWidth

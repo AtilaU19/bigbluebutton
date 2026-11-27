@@ -234,8 +234,15 @@ const getDeviceOrientation = ({ width, height }) => (height > width
 const isPhoneLandscape = (browser) => deviceInfo.isPhone
   && getDeviceOrientation(browser) === DEVICE_ORIENTATION.LANDSCAPE;
 
+const resolveMeetingLayoutType = (rawLayoutType) => {
+  if (!rawLayoutType) return undefined;
+  return Object.prototype.hasOwnProperty.call(LAYOUT_TYPE, rawLayoutType)
+    ? LAYOUT_TYPE[rawLayoutType]
+    : LAYOUT_TYPE.UNIFIED_LAYOUT;
+};
+
 export {
   suportedLayouts, LAYOUTS_SYNC, getSupportedLayouts, isLayoutSupported, layoutAllowedInSettings,
   getWaitLayout, getDeviceType, getInitialSidebarContentPanel,
-  isValidSynchronizationLayout, isPhoneLandscape,
+  isValidSynchronizationLayout, isPhoneLandscape, resolveMeetingLayoutType,
 };

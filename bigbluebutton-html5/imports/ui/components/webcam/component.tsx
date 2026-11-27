@@ -89,10 +89,26 @@ const WebcamComponent: React.FC<WebcamComponentProps> = ({
   const cameraDockRef = useRef(cameraDock);
   const cameraSizeRef = useRef(cameraSize);
   const cameraDockGridSettleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLocalDockResizingRef = useRef(false);
+  const pendingSnapPrevHeightRef = useRef<number | null>(null);
+  const isResizingResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const intl = useIntl();
 
   cameraDockRef.current = cameraDock;
   cameraSizeRef.current = cameraSize;
+
+  const stopCameraDockResize = useCallback(() => {
+    pendingSnapPrevHeightRef.current = null;
+    if (cameraDockGridSettleTimeoutRef.current !== null) {
+      clearTimeout(cameraDockGridSettleTimeoutRef.current);
+      cameraDockGridSettleTimeoutRef.current = null;
+    }
+    isLocalDockResizingRef.current = false;
+    layoutContextDispatch({
+      type: ACTIONS.SET_CAMERA_DOCK_IS_RESIZING,
+      value: false,
+    });
+  }, [layoutContextDispatch]);
 
   const lastSize = Storage.getItem('webcamSize') || { width: 0, height: 0 };
   const { height: lastHeight } = lastSize as { width: number, height: number };
@@ -118,10 +134,30 @@ const WebcamComponent: React.FC<WebcamComponentProps> = ({
   }, []);
 
   useEffect(() => () => {
+    pendingSnapPrevHeightRef.current = null;
     if (cameraDockGridSettleTimeoutRef.current !== null) {
       clearTimeout(cameraDockGridSettleTimeoutRef.current);
+      cameraDockGridSettleTimeoutRef.current = null;
     }
-  }, []);
+    if (isResizingResetTimeoutRef.current !== null) {
+      clearTimeout(isResizingResetTimeoutRef.current);
+      isResizingResetTimeoutRef.current = null;
+    }
+    if (isLocalDockResizingRef.current) {
+      isLocalDockResizingRef.current = false;
+      layoutContextDispatch({
+        type: ACTIONS.SET_CAMERA_DOCK_IS_RESIZING,
+        value: false,
+      });
+    }
+  }, [layoutContextDispatch]);
+
+  useEffect(() => {
+    if (pendingSnapPrevHeightRef.current !== null
+      && cameraDock.height !== pendingSnapPrevHeightRef.current) {
+      stopCameraDockResize();
+    }
+  }, [cameraDock.height, stopCameraDockResize]);
 
   useEffect(() => {
     setIsFullScreen(fullscreen.group === 'webcams');
@@ -189,7 +225,7 @@ const WebcamComponent: React.FC<WebcamComponentProps> = ({
   };
 
   const snapCameraDockToGrid = () => {
-    if (!snapToCameraGrid) return;
+    if (!snapToCameraGrid) return null;
 
     const currentCameraDock = cameraDockRef.current;
     const currentCameraSize = cameraSizeRef.current;
@@ -205,7 +241,7 @@ const WebcamComponent: React.FC<WebcamComponentProps> = ({
       )
       : currentCameraDock.height;
 
-    if (height === currentCameraDock.height) return;
+    if (height === currentCameraDock.height) return null;
 
     layoutContextDispatch({
       type: ACTIONS.SET_CAMERA_DOCK_SIZE,
@@ -216,6 +252,7 @@ const WebcamComponent: React.FC<WebcamComponentProps> = ({
         browserHeight: window.innerHeight,
       },
     });
+    return currentCameraDock.height;
   };
 
   const handleWebcamDragStart = () => {
@@ -313,10 +350,16 @@ const WebcamComponent: React.FC<WebcamComponentProps> = ({
               height: isDragging ? cameraSize?.height : cameraDock.height,
             }}
             onResizeStart={() => {
+              pendingSnapPrevHeightRef.current = null;
               if (cameraDockGridSettleTimeoutRef.current !== null) {
                 clearTimeout(cameraDockGridSettleTimeoutRef.current);
                 cameraDockGridSettleTimeoutRef.current = null;
               }
+              if (isResizingResetTimeoutRef.current !== null) {
+                clearTimeout(isResizingResetTimeoutRef.current);
+                isResizingResetTimeoutRef.current = null;
+              }
+              isLocalDockResizingRef.current = true;
               setIsResizing(true);
               setResizeStart({ width: cameraDock.width, height: cameraDock.height });
               onResizeHandle(cameraDock.width, cameraDock.height);
@@ -330,13 +373,13 @@ const WebcamComponent: React.FC<WebcamComponentProps> = ({
             }}
             onResizeStop={() => {
               setResizeStart({ width: 0, height: 0 });
-              setTimeout(() => setIsResizing(false), 500);
-              const stopCameraDockResize = () => {
-                layoutContextDispatch({
-                  type: ACTIONS.SET_CAMERA_DOCK_IS_RESIZING,
-                  value: false,
-                });
-              };
+              if (isResizingResetTimeoutRef.current !== null) {
+                clearTimeout(isResizingResetTimeoutRef.current);
+              }
+              isResizingResetTimeoutRef.current = setTimeout(() => {
+                isResizingResetTimeoutRef.current = null;
+                setIsResizing(false);
+              }, 500);
 
               if (snapToCameraGrid && isCameraTopOrBottom) {
                 // Let the throttled grid calculation observe the final pointer size before
@@ -346,8 +389,19 @@ const WebcamComponent: React.FC<WebcamComponentProps> = ({
                 }
                 cameraDockGridSettleTimeoutRef.current = setTimeout(() => {
                   cameraDockGridSettleTimeoutRef.current = null;
-                  snapCameraDockToGrid();
-                  stopCameraDockResize();
+                  const preSnapHeight = snapCameraDockToGrid();
+                  if (preSnapHeight !== null) {
+                    // Wait for LayoutEngine to commit the snapped cameraDock.height before
+                    // ending resize so PushLayoutEngine commits the final rate once.
+                    pendingSnapPrevHeightRef.current = preSnapHeight;
+                    // Fallback in case clamping leaves cameraDock.height unchanged.
+                    cameraDockGridSettleTimeoutRef.current = setTimeout(() => {
+                      cameraDockGridSettleTimeoutRef.current = null;
+                      stopCameraDockResize();
+                    }, 50);
+                  } else {
+                    stopCameraDockResize();
+                  }
                 }, CAMERA_DOCK_GRID_SETTLE_DELAY);
               } else {
                 stopCameraDockResize();

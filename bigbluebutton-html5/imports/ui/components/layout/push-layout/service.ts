@@ -1,11 +1,11 @@
 import {
-  CameraDockPropagationState, Input, MeetingCameraDock, Output,
+  CameraDockPropagationState, MeetingCameraDock, Output,
 } from '../layoutTypes';
 
 const equalDouble = (n1: number, n2: number) => {
-  const precision = 0.01;
+  const precision = 0.005;
 
-  return Math.abs(n1 - n2) <= precision;
+  return Math.abs(n1 - n2) < precision;
 };
 
 const calculatePresentationVideoRate = (cameraDockOutput: Output['cameraDock']) => {
@@ -28,13 +28,13 @@ const calculatePresentationVideoRate = (cameraDockOutput: Output['cameraDock']) 
 // No position fallback while suppressed: a changed position notifies everyone.
 const getPropagatedCameraDock = ({
   isSuppressed,
-  cameraDockOutput,
-  cameraDockInput,
+  cameraPosition,
+  presentationVideoRate,
   meetingCameraDock,
 }: {
   isSuppressed: boolean;
-  cameraDockOutput: Output['cameraDock'];
-  cameraDockInput: Input['cameraDock'];
+  cameraPosition: string;
+  presentationVideoRate: number;
   meetingCameraDock: MeetingCameraDock;
 }) => (isSuppressed
   ? {
@@ -43,9 +43,9 @@ const getPropagatedCameraDock = ({
     presentationVideoRate: meetingCameraDock.videoRate,
   }
   : {
-    isResizing: cameraDockInput.isResizing,
-    cameraPosition: cameraDockOutput.position || 'contentTop',
-    presentationVideoRate: calculatePresentationVideoRate(cameraDockOutput),
+    isResizing: false,
+    cameraPosition: cameraPosition || 'contentTop',
+    presentationVideoRate,
   });
 
 const hasCameraDockChanged = (
@@ -55,10 +55,13 @@ const hasCameraDockChanged = (
   if (curr.isCameraDockPropagationSuppressed) return false;
 
   const suppressionLifted = prev.isCameraDockPropagationSuppressed === true;
-  return suppressionLifted
-    || curr.cameraIsResizing !== prev.cameraIsResizing
-    || curr.cameraPosition !== prev.cameraPosition
-    || prev.presentationVideoRate === undefined
+  if (suppressionLifted || curr.cameraPosition !== prev.cameraPosition) {
+    return true;
+  }
+
+  if (curr.cameraIsResizing) return false;
+
+  return prev.presentationVideoRate === undefined
     || !equalDouble(curr.presentationVideoRate, prev.presentationVideoRate);
 };
 
