@@ -51,8 +51,8 @@ import { PluginConfigFromGraphql } from '../plugins-engine/types';
 import useJoinLogger from './hooks/useJoinLogger';
 import useAppInitialization from './hooks/useAppInitialization';
 import usePollShortcut from './hooks/usePollShortcut';
-import useUserStatusNotifications from './hooks/useUserStatusNotifications';
 import useSystemThemeSync from './hooks/useSystemThemeSync';
+import UserStatusNotificationsObserver from './user-status-notifications/component';
 import { NotesRenderMode } from '/imports/ui/components/notes/constants';
 import RequestPresenterContainer from '/imports/ui/components/request-presenter/container';
 import DocumentTitleManager from './document-title-manager/component';
@@ -63,9 +63,6 @@ interface AppProps {
   isBreakout: boolean;
   meetingId: string;
   meetingName: string;
-  currentUserAway?: boolean;
-  currentUserRaiseHand?: boolean;
-  currentUserHasVoice: boolean;
   shouldShowExternalVideo: boolean;
   shouldShowPresentation: boolean;
   shouldShowScreenshare: boolean;
@@ -88,8 +85,6 @@ const App: React.FC<AppProps> = ({
   isBreakout,
   meetingId,
   meetingName,
-  currentUserAway,
-  currentUserRaiseHand,
   shouldShowExternalVideo,
   shouldShowPresentation,
   shouldShowScreenshare,
@@ -101,7 +96,6 @@ const App: React.FC<AppProps> = ({
   isNotificationEnabled,
   isNonMediaLayout,
   isRaiseHandEnabled,
-  currentUserHasVoice,
   hideActionsBar,
   isPollingEnabled,
   layoutContextDispatch,
@@ -111,7 +105,6 @@ const App: React.FC<AppProps> = ({
   useAppInitialization();
   useJoinLogger(meetingId, meetingName, isBreakout);
   usePollShortcut(layoutContextDispatch, isPollingEnabled);
-  useUserStatusNotifications(meetingId, currentUserAway, currentUserRaiseHand, intl);
   useSystemThemeSync();
 
   useEffect(() => {
@@ -131,6 +124,7 @@ const App: React.FC<AppProps> = ({
   if (selectedLayout !== LAYOUT_TYPE.PRESENTATION_ONLY) {
     return (
       <>
+        <UserStatusNotificationsObserver meetingId={meetingId} />
         <BreakoutRoomsAppObserver />
         <WebRTCStatsObserver />
         <ScreenReaderAlertAdapter />
@@ -189,7 +183,7 @@ const App: React.FC<AppProps> = ({
           )}
           <BreakoutJoinConfirmationContainerGraphQL />
           <LiveKitMembershipsManager />
-          <AudioContainer currentUserHasVoice={currentUserHasVoice} />
+          <AudioContainer />
           {!hideNotificationToasts && isNotificationEnabled && (
             <ToastContainer rtl />
           )}
@@ -211,6 +205,7 @@ const App: React.FC<AppProps> = ({
   // Only load presentation for presentationOnly
   return (
     <>
+      <UserStatusNotificationsObserver meetingId={meetingId} />
       <ScreenReaderAlertAdapter />
       <PluginsEngineManager pluginConfig={pluginConfig} />
       {/* The plugins engine consumes voice state in this layout too. */}
@@ -236,4 +231,4 @@ const App: React.FC<AppProps> = ({
   );
 };
 
-export default App;
+export default React.memo(App);

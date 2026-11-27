@@ -120,7 +120,6 @@ const AudioContainer = (props) => {
   const {
     intl,
     userLocks,
-    currentUserHasVoice,
   } = props;
 
   const APP_CONFIG = window.meetingClientSettings.public.app;
@@ -166,7 +165,9 @@ const AudioContainer = (props) => {
     name: u.name,
     speechLocale: u.speechLocale,
     breakoutRoomsSummary: u.breakoutRoomsSummary,
+    voice: u.voice ? { joined: true } : null,
   }));
+  const currentUserHasVoice = Boolean(currentUser?.voice);
 
   const hasBreakoutRooms = (currentUser?.breakoutRoomsSummary?.totalOfBreakoutRooms ?? 0) > 0;
 
@@ -365,5 +366,4 @@ AudioContainer.propTypes = {
   userLocks: PropTypes.shape({
     userMic: PropTypes.bool.isRequired,
   }).isRequired,
-  currentUserHasVoice: PropTypes.bool,
 };

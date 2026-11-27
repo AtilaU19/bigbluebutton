@@ -4,7 +4,7 @@ import { notify } from '/imports/ui/services/notification';
 import { RAISED_HAND_USERS } from '/imports/ui/core/graphql/queries/users';
 import useDeduplicatedSubscription from '/imports/ui/core/hooks/useDeduplicatedSubscription';
 import useCurrentUser from '/imports/ui/core/hooks/useCurrentUser';
-import { RaisedHandUser } from '/imports/ui/Types/user';
+import { RaisedHandUser, User } from '/imports/ui/Types/user';
 import { filterByMeetingId } from '/imports/ui/core/utils/subscriptionFilters';
 
 const intlMessages = defineMessages({
@@ -30,16 +30,19 @@ const intlMessages = defineMessages({
   },
 });
 
+const projectCurrentUserStatus = (user: Partial<User>) => ({
+  userId: user.userId,
+  away: user.away,
+  raiseHand: user.raiseHand,
+});
+
 const useUserStatusNotifications = (
   meetingId: string,
-  currentUserAway?: boolean,
-  currentUserRaiseHand?: boolean,
   intl?: IntlShape,
 ) => {
-  const { data: currentUser } = useCurrentUser((user) => ({
-    userId: user.userId,
-    raiseHand: user.raiseHand,
-  }));
+  const { data: currentUser } = useCurrentUser(projectCurrentUserStatus);
+  const currentUserAway = currentUser?.away;
+  const currentUserRaiseHand = currentUser?.raiseHand;
   const { data: usersData } = useDeduplicatedSubscription<{ user: RaisedHandUser[] }>(RAISED_HAND_USERS);
   const raisedHandUsers = meetingId
     ? filterByMeetingId(
@@ -49,14 +52,19 @@ const useUserStatusNotifications = (
       (u) => ({ mismatchedUserId: u.userId, mismatchedName: u.name }),
     )
     : [];
-  const isCurrentUserNextRaisedHand = raisedHandUsers.length > 0 && currentUser?.raiseHand
+  const isCurrentUserNextRaisedHand = raisedHandUsers.length > 0 && currentUserRaiseHand
     ? raisedHandUsers[0]?.userId === currentUser?.userId
     : false;
-  const prevAwayRef = useRef<boolean | undefined>(currentUserAway);
-  const prevRaiseHandRef = useRef<boolean | undefined>(currentUserRaiseHand);
+  const prevAwayRef = useRef<boolean | undefined>(undefined);
+  const prevRaiseHandRef = useRef<boolean | undefined>(undefined);
   const prevRaisedHandNextRef = useRef<boolean | undefined>(isCurrentUserNextRaisedHand);
 
   useEffect(() => {
+    if (currentUserAway === undefined) return;
+    if (prevAwayRef.current === undefined) {
+      prevAwayRef.current = currentUserAway;
+      return;
+    }
     if (intl && prevAwayRef.current !== currentUserAway) {
       if (currentUserAway === true) {
         notify(intl.formatMessage(intlMessages.away), 'info', 'user');
@@ -68,6 +76,11 @@ const useUserStatusNotifications = (
   }, [currentUserAway, intl]);
 
   useEffect(() => {
+    if (currentUserRaiseHand === undefined) return;
+    if (prevRaiseHandRef.current === undefined) {
+      prevRaiseHandRef.current = currentUserRaiseHand;
+      return;
+    }
     if (intl && prevRaiseHandRef.current !== currentUserRaiseHand) {
       if (currentUserRaiseHand === true) {
         notify(intl.formatMessage(intlMessages.raisedHand), 'info', 'user');
